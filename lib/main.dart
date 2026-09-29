@@ -4,13 +4,6 @@ import 'package:neu_trade/core/config/app_config.dart';
 import 'package:neu_trade/core/router/app_router.dart';
 import 'package:neu_trade/core/services/auth_services.dart';
 import 'package:neu_trade/core/services/profile_services.dart';
-import 'package:neu_trade/core/services/post_services.dart';
-import 'package:neu_trade/features/post/data/datasources/post_remote_datasources.dart';
-import 'package:neu_trade/features/post/data/repositories/post_repository_impl.dart';
-import 'package:neu_trade/features/post/domain/repositories/post_repository.dart';
-import 'package:neu_trade/features/profile/data/datasources/profile_remote_datasource.dart';
-import 'package:neu_trade/features/profile/data/repositories/profile_repository_impl.dart';
-import 'package:neu_trade/features/profile/domain/repositories/profile_repository.dart';
 import 'package:neu_trade/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:neu_trade/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:neu_trade/features/auth/domain/usecases/forgot_password_use_case.dart';
@@ -20,7 +13,10 @@ import 'package:neu_trade/features/auth/domain/usecases/logout_use_case.dart';
 import 'package:neu_trade/features/auth/domain/usecases/sign_up_use_case.dart';
 import 'package:neu_trade/features/auth/domain/usecases/watch_auth_state_use_case.dart';
 import 'package:neu_trade/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:neu_trade/features/auth/presentation/bloc/auth_event.dart';
+import 'features/auth/presentation/bloc/auth_event.dart';
+import 'package:neu_trade/features/profile/data/datasources/profile_remote_datasource.dart';
+import 'package:neu_trade/features/profile/data/repositories/profile_repository_impl.dart';
+import 'package:neu_trade/features/profile/domain/repositories/profile_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -46,12 +42,7 @@ Future<void> main() async {
     remoteDatasource: ProfileRemoteDataSourceImpl(ProfileServices()),
   );
 
-  runApp(
-    MyApp(
-      authBloc: authBloc,
-      profileRepository: profileRepository,
-    ),
-  );
+  runApp(MyApp(authBloc: authBloc, profileRepository: profileRepository));
 }
 
 class MyApp extends StatelessWidget {
