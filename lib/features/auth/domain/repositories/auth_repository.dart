@@ -1,0 +1,28 @@
+import 'package:neu_trade/core/error/failure.dart';
+import 'package:neu_trade/features/auth/domain/entities/user_entities.dart';
+import 'package:fpdart/fpdart.dart';
+
+abstract class AuthRepository {
+  Future<Either<Failure, UserEntity?>> getCurrentUser();
+
+  // Sign in with email and password.
+  Future<Either<Failure, UserEntity>> login({
+    required String email,
+    required String password,
+  });
+
+  // Sign up with username, email, and password.
+  Future<Either<Failure, UserEntity>> signUp({
+    required String email,
+    required String password,
+  });
+
+  // Send a password-reset email.
+  Future<Either<Failure, void>> forgotPassword({required String email});
+
+  // Sign out the current user.
+  Future<Either<Failure, void>> logout();
+
+  // Emits the current user whenever the Supabase auth session changes.
+  Stream<Either<Failure, UserEntity?>> watchAuthState();
+}
