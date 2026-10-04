@@ -42,7 +42,12 @@ Future<void> main() async {
     remoteDatasource: ProfileRemoteDataSourceImpl(ProfileServices()),
   );
 
-  runApp(MyApp(authBloc: authBloc, profileRepository: profileRepository));
+  runApp(
+    MyApp(
+      authBloc: authBloc,
+      profileRepository: profileRepository,
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

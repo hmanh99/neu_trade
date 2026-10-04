@@ -1,6 +1,9 @@
 import 'dart:typed_data';
+
 import 'package:neu_trade/core/error/exceptions.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../features/post/domain/entities/create_post_request.dart';
 
 class PostServices {
   PostServices({required this.userId, SupabaseClient? client})
@@ -10,17 +13,8 @@ class PostServices {
 
   void _requireSession() {
     if (_client.auth.currentUser?.id != userId) {
-      throw ServerException(
-        message: 'Phiên đăng nhập đã thay đổi. Vui lòng đăng nhập lại.',
-      );
+      throw ServerException(message: 'Vui lòng đăng nhập lại.');
     }
-  }
-
-  Future<Map<String, dynamic>> getOptions() async {
-    _requireSession();
-    return Map<String, dynamic>.from(
-      await _client.rpc('get_post_options') as Map,
-    );
   }
 
   Future<String> getStudentId() async {
@@ -29,8 +23,8 @@ class PostServices {
         .from('sinh_vien')
         .select('msv')
         .eq('sinhvien_id', userId)
-        .maybeSingle();
-    final studentId = row?['msv'] as String?;
+        .single();
+    final studentId = row['msv'] as String?;
     if (studentId == null || !RegExp(r'^[A-Za-z0-9]+$').hasMatch(studentId)) {
       throw ServerException(
         message:
@@ -40,12 +34,24 @@ class PostServices {
     return studentId;
   }
 
-  Future<String> uploadImage({
-    required String path,
+  Future<Map<String, dynamic>> getOptions() async {
+    _requireSession();
+    final result = await _client.rpc('get_post_options');
+    return Map<String, dynamic>.from(result as Map);
+  }
+
+  Future<UploadedPostImage> uploadImage({
+    required String requestId,
+    required int index,
     required Uint8List bytes,
+    required String extension,
     required String contentType,
   }) async {
     _requireSession();
+
+    final studentId = await getStudentId();
+    final path = '$studentId/$requestId/$index.$extension';
+
     await _client.storage
         .from('documents')
         .uploadBinary(
@@ -53,7 +59,8 @@ class PostServices {
           bytes,
           fileOptions: FileOptions(contentType: contentType, upsert: true),
         );
-    return _client.storage.from('documents').getPublicUrl(path);
+    final url = _client.storage.from('documents').getPublicUrl(path);
+    return UploadedPostImage(path: path, url: url);
   }
 
   Future<void> removeImage(String path) async {
@@ -72,9 +79,8 @@ class PostServices {
 
   Future<Map<String, dynamic>> createPost(Map<String, dynamic> params) async {
     _requireSession();
-    return Map<String, dynamic>.from(
-      await _client.rpc('create_post', params: params) as Map,
-    );
+    final result = await _client.rpc('create_post', params: params);
+    return Map<String, dynamic>.from(result as Map);
   }
 
   Future<List<Map<String, dynamic>>> getPosts() async {
@@ -85,6 +91,18 @@ class PostServices {
         .eq('trang_thai_tin', 'DangHienThi')
         .order('ngay_tao', ascending: false)
         .limit(50);
+    return result;
+  }
+
+  Future<Map<String, dynamic>> getPost({required int postId}) async {
+    _requireSession();
+    final result = await _client
+        .from('tin_dang')
+        .select('*,tai_lieu!inner(*)')
+        .eq('tindang_id', postId)
+        .eq('trang_thai_tin', 'DangHienThi')
+        .order('ngay_tao', ascending: false)
+        .single();
     return result;
   }
 }

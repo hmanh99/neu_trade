@@ -123,6 +123,7 @@ begin
 
   -- Populate a typed record so existing enums, varchar limits and numeric types apply.
   select * into v_document from pg_catalog.jsonb_populate_record(null::public.tai_lieu, p_document);
+  select * into v_post from pg_catalog.jsonb_populate_record(null::public.tin_dang, p_post);
   insert into public.tai_lieu(sinhvien_id, danhmuc, ten_sach, nam_xuat_ban, do_moi, ghi_chu_tinh_trang, gia_ban)
     values(v_user, v_document.danhmuc, btrim(v_document.ten_sach), v_document.nam_xuat_ban,
       v_document.do_moi, v_document.ghi_chu_tinh_trang, v_document.gia_ban)
@@ -130,7 +131,8 @@ begin
   insert into public.tin_dang(tailieu_id, nguoi_dang_id, ho_ten_nguoi_dang,
     tieu_de, noi_dung_mo_ta, dia_chi, hinh_anh)
     values(v_document.tailieu_id, v_user, v_student.ho_ten,
-      btrim(p_post ->> 'tieu_de'), p_post ->> 'noi_dung_mo_ta', p_post ->> 'dia_chi', p_image_url)
+      btrim(v_post.tieu_de), v_post.noi_dung_mo_ta, v_post.dia_chi,
+      case when p_image_url is null then '{}'::text[] else array[p_image_url] end)
     returning * into v_post;
   insert into public.post_requests(request_id, sinhvien_id, tindang_id, payload)
     values(p_request_id, v_user, v_post.tindang_id, v_payload);
@@ -148,9 +150,11 @@ grant execute on function public.create_post(uuid,jsonb,jsonb,text,text) to auth
 alter table public.tin_dang enable row level security;
 alter table public.tai_lieu enable row level security;
 grant select on public.tin_dang, public.tai_lieu to authenticated;
+drop policy if exists post_feature_read_posts on public.tin_dang;
 create policy post_feature_read_posts on public.tin_dang for select to authenticated
   using (trang_thai_tin = 'DangHienThi' or nguoi_dang_id = (select auth.uid()));
 -- Avoid querying tin_dang here, which would create a recursive RLS dependency.
+drop policy if exists post_feature_read_documents on public.tai_lieu;
 create policy post_feature_read_documents on public.tai_lieu for select to authenticated using (true);
 
 -- Public downloads; writes are still authenticated and scoped by student code.
@@ -166,14 +170,19 @@ $$;
 create or replace function public.can_write_document_image(p_path text)
 returns boolean language sql stable security definer set search_path = '' as $$
   select public.owns_document_path(p_path) and not exists (
-    select 1 from public.tin_dang where hinh_anh =
+    select 1 from public.tin_dang where
       'https://kfwpqnxugybgcuhlqtci.supabase.co/storage/v1/object/public/documents/' || p_path
+      = any(coalesce(hinh_anh, '{}'::text[]))
   );
 $$;
 revoke all on function public.owns_document_path(text) from public, anon;
 revoke all on function public.can_write_document_image(text) from public, anon;
 grant execute on function public.owns_document_path(text) to authenticated;
 grant execute on function public.can_write_document_image(text) to authenticated;
+drop policy if exists post_feature_storage_select on storage.objects;
+drop policy if exists post_feature_storage_insert on storage.objects;
+drop policy if exists post_feature_storage_update on storage.objects;
+drop policy if exists post_feature_storage_delete on storage.objects;
 create policy post_feature_storage_select on storage.objects for select to authenticated
   using(bucket_id = 'documents' and public.owns_document_path(name));
 create policy post_feature_storage_insert on storage.objects for insert to authenticated

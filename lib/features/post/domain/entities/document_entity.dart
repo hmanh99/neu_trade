@@ -1,5 +1,8 @@
 import 'package:equatable/equatable.dart';
 
+import 'category.dart';
+import 'condition.dart';
+
 class DocumentEntity extends Equatable {
   const DocumentEntity({
     required this.id,
@@ -11,10 +14,15 @@ class DocumentEntity extends Equatable {
     this.publicationYear,
     this.conditionNote,
   });
+
   final int id;
-  final String ownerId, category, name, condition, price;
+  final String ownerId, name;
+  final double price;
+  final Category category;
+  final Condition condition;
   final int? publicationYear;
   final String? conditionNote;
+
   @override
   List<Object?> get props => [
     id,

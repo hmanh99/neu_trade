@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import 'address.dart';
 import 'document_entity.dart';
 
 class PostEntity extends Equatable {
@@ -12,14 +13,18 @@ class PostEntity extends Equatable {
     required this.status,
     required this.createdAt,
     this.description,
-    this.address,
-    this.imageUrl,
+    required this.address,
+    this.imageUrls = const [],
   });
+
   final int id;
   final DocumentEntity document;
   final String authorId, authorName, title, status;
   final DateTime createdAt;
-  final String? description, address, imageUrl;
+  final Address address;
+  final String? description;
+  final List<String> imageUrls;
+
   @override
   List<Object?> get props => [
     id,
@@ -31,6 +36,6 @@ class PostEntity extends Equatable {
     createdAt,
     description,
     address,
-    imageUrl,
+    imageUrls,
   ];
 }

@@ -3,12 +3,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:neu_trade/core/router/route_names.dart';
 import 'package:neu_trade/core/router/route_paths.dart';
+import 'package:neu_trade/core/services/post_services.dart';
+import 'package:neu_trade/features/post/data/datasources/post_remote_datasources.dart';
+import 'package:neu_trade/features/post/data/repositories/post_repository_impl.dart';
+import 'package:neu_trade/features/post/domain/usecases/create_post_use_case.dart';
+import 'package:neu_trade/features/post/presentation/bloc/post_bloc.dart';
 import 'package:neu_trade/features/post/presentation/screens/post_screen.dart';
 import 'package:neu_trade/features/profile/domain/repositories/profile_repository.dart';
 import 'package:neu_trade/features/profile/domain/usecases/get_profile_use_case.dart';
 import 'package:neu_trade/features/profile/domain/usecases/save_profile_use_case.dart';
 import 'package:neu_trade/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:neu_trade/features/profile/presentation/screens/profile_setup_screen.dart';
+import 'package:neu_trade/shared/wigdets/main_shell.dart';
 
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../../features/auth/presentation/bloc/auth_state.dart';
@@ -67,15 +73,16 @@ GoRouter createAppRouter(
         },
       ),
 
-      /// default app route redirect
+      GoRoute(
+        path: AppRoutePaths.app,
+        redirect: (context, state) => AppRoutePaths.appHome,
+      ),
+
+      /// Main app tabs.
       StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) =>
-            BlocBuilder<AuthBloc, AuthState>(
-              bloc: authBloc,
-              builder: (context, authState) {
-                return PostScreen();
-              },
-            ),
+        builder: (context, state, navigationShell) {
+          return MainShellScreen(navigationShell: navigationShell);
+        },
         branches: [
           StatefulShellBranch(
             routes: [
@@ -95,7 +102,23 @@ GoRouter createAppRouter(
                 builder: (context, state) => BlocBuilder<AuthBloc, AuthState>(
                   bloc: authBloc,
                   builder: (context, authState) {
-                    return const PostScreen();
+                    final user = switch (authState) {
+                      AuthLoginState(:final user) => user,
+                      AuthSignUpState(:final user) => user,
+                      _ => null,
+                    };
+                    if (user == null) return const SizedBox.shrink();
+                    final repository = PostRepositoryImpl(
+                      remoteDatasource: PostRemoteDataSourceImpl(
+                        PostServices(userId: user.id),
+                      ),
+                    );
+                    return BlocProvider(
+                      key: ValueKey(user.id),
+                      create: (_) =>
+                          PostBloc(createPost: CreatePostUseCase(repository)),
+                      child: const PostScreen(),
+                    );
                   },
                 ),
               ),

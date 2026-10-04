@@ -1,3 +1,6 @@
+import 'package:neu_trade/features/post/domain/entities/category.dart';
+import 'package:neu_trade/features/post/domain/entities/condition.dart';
+
 import '../../domain/entities/document_entity.dart';
 
 class DocumentModel extends DocumentEntity {
@@ -14,10 +17,10 @@ class DocumentModel extends DocumentEntity {
   factory DocumentModel.fromJson(Map<String, dynamic> json) => DocumentModel(
     id: (json['tailieu_id'] as num).toInt(),
     ownerId: json['sinhvien_id'] as String,
-    category: json['danhmuc'] as String,
+    category: Category.fromString(json['danhmuc'] as String),
     name: json['ten_sach'] as String,
-    condition: json['do_moi'] as String,
-    price: json['gia_ban'].toString(),
+    condition: Condition.fromString(json['do_moi'] as String),
+    price: (json['gia_ban']) as double,
     publicationYear: (json['nam_xuat_ban'] as num?)?.toInt(),
     conditionNote: json['ghi_chu_tinh_trang'] as String?,
   );
