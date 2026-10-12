@@ -12,6 +12,7 @@ class ColorConstants {
   static const green = Colors.green;
   static const red = Colors.red;
   static const yellow = Colors.yellow;
+  static const orange = Colors.orange;
 
   // Primary & Secondary Brand Colors
   static const primaryColor = Colors.blue;
@@ -30,12 +31,50 @@ class ColorConstants {
 
   // White Variations
   static const white24 = Colors.white24;
+  static const white38 = Colors.white38;
+  static const white54 = Colors.white54;
+  static const white70 = Colors.white70;
+
+  // Black Variations
+  static const black12 = Colors.black12;
+  static const black26 = Colors.black26;
+  static const black38 = Colors.black38;
+  static const black45 = Colors.black45;
+  static const black54 = Colors.black54;
+  static const black87 = Colors.black87;
 
   // Red & Error Shades
   static const redAccent = Colors.redAccent;
   static const redShade50 = Color(0xFFFFEBEE);
   static const redShade100 = Color(0xFFFFCDD2);
   static const redShade400 = Color(0xFFEF5350);
+  static const redShade700 = Color(0xFFD32F2F);
+
+  // Green Shades
+  static const greenShade50 = Color(0xFFE8F5E9);
+  static const greenShade100 = Color(0xFFC8E6C9);
+  static const greenShade600 = Color(0xFF43A047);
+  static const greenShade700 = Color(0xFF2E7D32);
+
+  // Blue Shades
+  static const blueShade50 = Color(0xFFE3F2FD);
+  static const blueShade100 = Color(0xFFBBDEFB);
+  static const blueShade700 = Color(0xFF1976D2);
+
+  // Orange & Warning Shades
+  static const orangeShade50 = Color(0xFFFFF3E0);
+  static const orangeShade100 = Color(0xFFFFE0B2);
+  static const orangeShade700 = Color(0xFFF57C00);
+
+  // Semantic UI Colors
+  static const cardColor = Colors.white;
+  static const dividerColor = Color(0xFFEEEEEE);
+  static const borderLightColor = Color(0xFFEEEEEE);
+  static const successColor = Colors.green;
+  static const successLightColor = Color(0xFFE8F5E9);
+  static const warningColor = Colors.orange;
+  static const warningLightColor = Color(0xFFFFF3E0);
+  static const errorLightColor = Color(0xFFFFEBEE);
 
   // Base
   static const backgroundColor = Color(0xFFF2F2F2);
@@ -72,66 +111,6 @@ class ColorConstants {
   // Error States
   static const errorColor = Color(0xFFEF5350);
 
-  // Difficulty Levels
-  static const difficultyBeginnerBgColor = Color(0xFFE8F5E9);
-  static const difficultyBeginnerTextColor = Color(0xFF2E7D32);
-  static const difficultyIntermediateBgColor = Color(0xFFFFF3E0);
-  static const difficultyIntermediateTextColor = Color(0xFFEF6C00);
-  static const difficultyAdvancedBgColor = Color(0xFFFFEBEE);
-  static const difficultyAdvancedTextColor = Color(0xFFC62828);
-
-  // Schedule Statuses
-  static const scheduleUpcomingColor = Color(0xFF5B8DEF);
-  static const scheduleInProgressColor = Color(0xFFFF9B52);
-  static const scheduleDoneColor = Color(0xFF4CD964);
-
-  // Meal Types
-  static const mealBreakfastColor = Color(0xFF92A3FD);
-  static const mealLunchColor = Color(0xFFC58BF2);
-  static const mealDinnerColor = Color(0xFFFF9B70);
-
-  // Muscle Groups
-  static const muscleGroupChestColor = Color(0xFF5B8DEF);
-  static const muscleGroupBackColor = Color(0xFF4CAF82);
-  static const muscleGroupShouldersColor = Color(0xFFFF9B52);
-  static const muscleGroupArmsColor = Color(0xFFC58BF2);
-  static const muscleGroupLegsColor = Color(0xFFEF5350);
-  static const muscleGroupCoreColor = Color(0xFFFFB74D);
-
-  // Calories Badge
-  static const caloriesIconColor = Colors.orangeAccent;
-  static const caloriesTextColor = Color(0xFFE65100);
-
-  // Borders, Dividers & Skeletons
-  static const borderLightColor = Color(0xFFF5F5F5);
-  static const skeletonColor = Colors.white38;
-  static const dividerColor = Colors.grey;
-
-  // Placeholders
-  static const placeholderDarkColor = Colors.grey;
-  static const recommendationPlaceholderColors = Colors.grey;
-
-  // Gradients & Alignment
-  static const bmiGradientColors = <Color>[
-    Color(0xFF6FCFED),
-    Color(0xFF4CAF82),
-    Color(0xFFFF8C42),
-    Colors.redAccent,
-  ];
-
-  // Heat map colors
-  static const List<Color> heatMapColor = [
-    Color(0xFFDDFFCF),
-    Color(0xFF93F990),
-    Color(0xFF21F34B),
-    Color(0xFF006813),
-  ];
-
   static const gradientBegin = Alignment.topLeft;
   static const gradientEnd = Alignment.bottomRight;
-
-  static const bmiUnderweightColor = Color(0xFF6FCFED);
-  static const bmiNormalColor = Color(0xFF4CAF82);
-  static const bmiOverweightColor = Color(0xFFFF8C42);
-  static const bmiObeseColor = Colors.redAccent;
 }

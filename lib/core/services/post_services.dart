@@ -3,8 +3,6 @@ import 'dart:typed_data';
 import 'package:neu_trade/core/error/exceptions.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../features/post/domain/entities/create_post_request.dart';
-
 class PostServices {
   PostServices({required this.userId, SupabaseClient? client})
     : _client = client ?? Supabase.instance.client;
@@ -40,7 +38,7 @@ class PostServices {
     return Map<String, dynamic>.from(result as Map);
   }
 
-  Future<UploadedPostImage> uploadImage({
+  Future<({String path, String url})> uploadImage({
     required String requestId,
     required int index,
     required Uint8List bytes,
@@ -60,7 +58,7 @@ class PostServices {
           fileOptions: FileOptions(contentType: contentType, upsert: true),
         );
     final url = _client.storage.from('documents').getPublicUrl(path);
-    return UploadedPostImage(path: path, url: url);
+    return (url: url, path: path);
   }
 
   Future<void> removeImage(String path) async {
@@ -101,7 +99,6 @@ class PostServices {
         .select('*,tai_lieu!inner(*)')
         .eq('tindang_id', postId)
         .eq('trang_thai_tin', 'DangHienThi')
-        .order('ngay_tao', ascending: false)
         .single();
     return result;
   }

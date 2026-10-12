@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:neu_trade/core/constants/color_constants.dart';
+import 'package:neu_trade/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:neu_trade/features/auth/presentation/bloc/auth_event.dart';
+import 'package:neu_trade/features/auth/presentation/bloc/auth_state.dart';
 import 'package:neu_trade/features/profile/domain/entities/user_profile.dart';
 import 'package:neu_trade/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:neu_trade/features/profile/presentation/bloc/profile_event.dart';
 import 'package:neu_trade/features/profile/presentation/bloc/profile_state.dart';
+import 'package:neu_trade/features/profile/presentation/widgets/profile_field.dart';
+
+import '../widgets/profile_message.dart';
+import '../widgets/stat.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -32,43 +40,75 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await completed;
   }
 
+  Future<void> _confirmSignOut() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Xác nhận đăng xuất'),
+        content: const Text('Bạn có chắc chắn muốn đăng xuất không?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Hủy'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            child: const Text('Đăng xuất'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      context.read<AuthBloc>().add(const AuthSignOutEvent());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ProfileBloc, ProfileState>(
-      builder: (context, state) {
-        final loading =
-            state is ProfileInitialState ||
-            state is ProfileLoadingState ||
-            state is ProfileSavingState;
-        return Scaffold(
-          backgroundColor: const Color(0xFFF5F7FB),
-          appBar: AppBar(
-            title: const Text('Hồ sơ'),
-            automaticallyImplyLeading: false,
-            actions: [
-              IconButton(
-                tooltip: 'Tải lại hồ sơ',
-                onPressed: loading ? null : _reload,
-                icon: const Icon(Icons.refresh_rounded),
-              ),
-            ],
-          ),
-          body: SafeArea(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 680),
-                child: _body(state),
-              ),
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, authState) {
+        if (authState is AuthErrorState) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authState.message),
+              backgroundColor: Colors.red,
             ),
-          ),
-        );
+          );
+        }
       },
+      child: BlocBuilder<ProfileBloc, ProfileState>(
+        builder: (context, state) {
+          final loading =
+              state is ProfileInitialState ||
+              state is ProfileLoadingState ||
+              state is ProfileSavingState;
+          return Scaffold(
+            backgroundColor: const Color(0xFFF5F7FB),
+            appBar: AppBar(
+              title: const Text('Hồ sơ'),
+              automaticallyImplyLeading: false,
+              actions: [
+                IconButton(
+                  tooltip: 'Tải lại hồ sơ',
+                  onPressed: loading ? null : _reload,
+                  icon: const Icon(Icons.refresh_rounded),
+                ),
+              ],
+            ),
+            body: SafeArea(child: _body(state)),
+          );
+        },
+      ),
     );
   }
 
   Widget _body(ProfileState state) {
     if (state is ProfileErrorState) {
-      return _ProfileMessage(
+      return ProfileMessage(
         icon: Icons.cloud_off_outlined,
         title: 'Không thể tải hồ sơ',
         message: 'Vui lòng kiểm tra kết nối và thử lại.',
@@ -78,7 +118,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (state is ProfileLoadedState) {
       final profile = state.profile;
       if (profile == null) {
-        return _ProfileMessage(
+        return ProfileMessage(
           icon: Icons.person_outline,
           title: 'Chưa có thông tin sinh viên',
           message: 'Tài khoản của bạn chưa có hồ sơ được lưu.',
@@ -108,30 +148,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               child: Column(
                 children: [
-                  _ProfileField(
+                  ProfileField(
                     icon: Icons.badge_outlined,
                     label: 'Mã sinh viên',
                     value: profile.studentId,
                   ),
                   const Divider(height: 1, indent: 56, endIndent: 16),
-                  _ProfileField(
+                  ProfileField(
                     icon: Icons.person_outline,
                     label: 'Họ và tên',
                     value: profile.fullName,
                   ),
                   const Divider(height: 1, indent: 56, endIndent: 16),
-                  _ProfileField(
+                  ProfileField(
                     icon: Icons.phone_outlined,
                     label: 'Số điện thoại',
                     value: profile.phone,
                   ),
                   const Divider(height: 1, indent: 56, endIndent: 16),
-                  _ProfileField(
+                  ProfileField(
                     icon: Icons.alternate_email,
                     label: 'Email sinh viên',
                     value: profile.email,
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            InkWell(
+              onTap: _confirmSignOut,
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                width: double.infinity,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: ColorConstants.buttonColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Center(
+                  child: Text(
+                    "Đăng xuất",
+                    style: TextStyle(color: ColorConstants.buttonTextColor),
+                  ),
+                ),
               ),
             ),
           ],
@@ -196,15 +255,13 @@ class _ProfileHeader extends StatelessWidget {
           LayoutBuilder(
             builder: (context, constraints) {
               final stats = [
-                _Stat(
-                  icon: Icons.star_outline_rounded,
+                Stat(
                   value:
                       profile.reputationScore?.toStringAsFixed(2) ??
                       'Chưa có dữ liệu',
                   label: 'Điểm uy tín',
                 ),
-                _Stat(
-                  icon: Icons.cancel_outlined,
+                Stat(
                   value:
                       profile.cancelledOrderCount?.toString() ??
                       'Chưa có dữ liệu',
@@ -233,90 +290,3 @@ class _ProfileHeader extends StatelessWidget {
   }
 }
 
-class _ProfileField extends StatelessWidget {
-  const _ProfileField({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  final IconData icon;
-  final String label, value;
-
-  @override
-  Widget build(BuildContext context) => ListTile(
-    leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
-    title: Text(label),
-    subtitle: Text(value.trim().isEmpty ? 'Chưa cập nhật' : value),
-  );
-}
-
-class _Stat extends StatelessWidget {
-  const _Stat({required this.icon, required this.value, required this.label});
-
-  final IconData icon;
-  final String value, label;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    children: [
-      Icon(icon, color: Colors.white70, size: 22),
-      const SizedBox(height: 8),
-      Text(
-        value,
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.w800,
-          color: Colors.white,
-        ),
-      ),
-      const SizedBox(height: 4),
-      Text(
-        label,
-        textAlign: TextAlign.center,
-        style: const TextStyle(fontSize: 13, color: Colors.white70),
-      ),
-    ],
-  );
-}
-
-class _ProfileMessage extends StatelessWidget {
-  const _ProfileMessage({
-    required this.icon,
-    required this.title,
-    required this.message,
-    required this.onRetry,
-  });
-
-  final IconData icon;
-  final String title, message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) => Center(
-    child: SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 52, color: Theme.of(context).colorScheme.primary),
-          const SizedBox(height: 16),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 8),
-          Text(message, textAlign: TextAlign.center),
-          const SizedBox(height: 16),
-          FilledButton.icon(
-            onPressed: onRetry,
-            icon: const Icon(Icons.refresh),
-            label: const Text('Thử lại'),
-          ),
-        ],
-      ),
-    ),
-  );
-}

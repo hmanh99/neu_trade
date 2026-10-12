@@ -52,7 +52,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           _email.clear();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('reset_email_sent'),
+              content: Text('Gửi thành công'),
               backgroundColor: ColorConstants.snackBarSuccessColor,
             ),
           );
@@ -119,7 +119,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                   const SizedBox(height: 24),
                   Text(
-                    'forgot_password_title',
+                    'Quên mật khẩu',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -127,7 +127,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'forgot_password_subtitle',
+                    'Đặt lại mật khẩu',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 13,
@@ -144,19 +144,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         TextFormField(
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'email_required';
+                              return 'Yêu cầu điển email';
                             }
                             if (!RegExp(
                               r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
                             ).hasMatch(value)) {
-                              return 'email_invalid';
+                              return 'Email không hợp lệ';
                             }
                             return null;
                           },
                           controller: _email,
                           enabled: !isLoading,
                           decoration: InputDecoration(
-                            hintText: 'email_hint',
+                            hintText: 'example@example.com',
                             prefixIcon: const Icon(Icons.email),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -186,7 +186,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                     color: ColorConstants.buttonTextColor,
                                   ),
                                 )
-                              : Text('send_reset_link'),
+                              : Text('Gửi yêu cầu đặt lại mật khẩu'),
                         ),
                       ],
                     ),
@@ -199,7 +199,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       Padding(
                         padding: const EdgeInsets.all(12),
                         child: Text(
-                          'or_divider',
+                          'hoặc',
                           style: const TextStyle(
                             color: ColorConstants.textSecondaryColor,
                             fontSize: 13,
@@ -223,9 +223,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                         children: [
-                          TextSpan(text: 'remember_password_prompt'),
+                          TextSpan(text: 'Nhớ mật khẩu? '),
                           TextSpan(
-                            text: 'login_button',
+                            text: 'Quay lại đăng nhập',
                             style: const TextStyle(
                               color: ColorConstants.textHighlightColor,
                             ),

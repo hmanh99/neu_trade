@@ -4,16 +4,25 @@ import 'package:go_router/go_router.dart';
 import 'package:neu_trade/core/router/route_names.dart';
 import 'package:neu_trade/core/router/route_paths.dart';
 import 'package:neu_trade/core/services/post_services.dart';
-import 'package:neu_trade/features/post/data/datasources/post_remote_datasources.dart';
-import 'package:neu_trade/features/post/data/repositories/post_repository_impl.dart';
-import 'package:neu_trade/features/post/domain/usecases/create_post_use_case.dart';
-import 'package:neu_trade/features/post/presentation/bloc/post_bloc.dart';
-import 'package:neu_trade/features/post/presentation/screens/post_screen.dart';
+import 'package:neu_trade/core/services/report_services.dart';
+import 'package:neu_trade/core/services/transaction_services.dart';
+import 'package:neu_trade/features/home/presentation/bloc/post_detail_bloc.dart';
 import 'package:neu_trade/features/profile/domain/repositories/profile_repository.dart';
 import 'package:neu_trade/features/profile/domain/usecases/get_profile_use_case.dart';
 import 'package:neu_trade/features/profile/domain/usecases/save_profile_use_case.dart';
 import 'package:neu_trade/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:neu_trade/features/profile/presentation/screens/profile_setup_screen.dart';
+import 'package:neu_trade/features/transaction/data/datasources/transaction_remote_datasource.dart';
+import 'package:neu_trade/features/transaction/data/repositories/transaction_repository_impl.dart';
+import 'package:neu_trade/features/transaction/domain/usecases/complete_transaction_usecase.dart';
+import 'package:neu_trade/features/transaction/domain/usecases/create_transaction_usecase.dart';
+import 'package:neu_trade/features/transaction/domain/usecases/get_transactions_usecase.dart';
+import 'package:neu_trade/features/transaction/presentation/bloc/transaction_bloc.dart';
+import 'package:neu_trade/features/upload/data/datasources/post_remote_datasources.dart';
+import 'package:neu_trade/features/upload/data/repositories/upload_post_repository_impl.dart';
+import 'package:neu_trade/features/upload/domain/usecases/create_post_use_case.dart';
+import 'package:neu_trade/features/upload/presentation/bloc/upload_post_bloc.dart';
+import 'package:neu_trade/features/upload/presentation/screens/upload_post_screen.dart';
 import 'package:neu_trade/shared/wigdets/main_shell.dart';
 
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
@@ -21,7 +30,16 @@ import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/signup_screen.dart';
-import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/home/data/datasources/home_post_remote_datasource.dart';
+import '../../features/home/data/datasources/home_post_report_datasource.dart';
+import '../../features/home/data/repositories/home_post_repository_impl.dart';
+import '../../features/home/data/repositories/home_post_report_repository_impl.dart';
+import '../../features/home/domain/usecases/get_home_post_usecase.dart';
+import '../../features/home/domain/usecases/get_home_posts_usecase.dart';
+import '../../features/home/domain/usecases/send_home_report_usecase.dart';
+import '../../features/home/presentation/bloc/home_post_bloc.dart';
+import '../../features/home/presentation/screens/home_post_screen.dart';
+import '../../features/home/presentation/screens/post_detail_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/transaction/presentation/screens/transaction_screen.dart';
 import 'auth_redirect.dart';
@@ -89,16 +107,90 @@ GoRouter createAppRouter(
               GoRoute(
                 path: AppRoutePaths.appHome,
                 name: AppRouteNames.appHome,
-                builder: (context, state) => const HomeScreen(),
-                routes: [],
+                builder: (context, state) => BlocBuilder<AuthBloc, AuthState>(
+                  bloc: authBloc,
+                  builder: (context, authState) {
+                    final user = switch (authState) {
+                      AuthLoginState(:final user) => user,
+                      AuthSignUpState(:final user) => user,
+                      _ => null,
+                    };
+                    if (user == null) return const SizedBox.shrink();
+                    final datasource = HomePostRemoteDatasourceImpl(
+                      PostServices(userId: user.id),
+                    );
+                    final repository = HomePostRepositoryImpl(
+                      homePostRemoteDatasource: datasource,
+                    );
+                    return BlocProvider(
+                      key: ValueKey(user.id),
+                      create: (_) => HomeBloc(
+                        getHomePosts: GetHomePostsUsecase(repository),
+                      ),
+                      child: const HomeScreen(),
+                    );
+                  },
+                ),
+                routes: [
+                  GoRoute(
+                    path: 'post/:id',
+                    name: AppRouteNames.postDetail,
+                    builder: (context, state) {
+                      final postId =
+                          int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+                      final authState = authBloc.state;
+                      final user = switch (authState) {
+                        AuthLoginState(:final user) => user,
+                        AuthSignUpState(:final user) => user,
+                        _ => null,
+                      };
+                      final userId = user?.id ?? '';
+
+                      // Home post dependencies
+                      final postDatasource = HomePostRemoteDatasourceImpl(
+                        PostServices(userId: userId),
+                      );
+                      final postRepository = HomePostRepositoryImpl(
+                        homePostRemoteDatasource: postDatasource,
+                      );
+                      final reportRepository = HomePostReportRepositoryImpl(
+                        homePostReportDatasource: HomePostReportDatasourceImpl(
+                          ReportServices(userId: userId),
+                        ),
+                      );
+
+                      // Transaction dependencies for reservation
+                      final transactionDatasource =
+                          TransactionRemoteDatasourceImpl(
+                        TransactionServices(userId: userId),
+                      );
+                      final transactionRepository = TransactionRepositoryImpl(
+                        remoteDatasource: transactionDatasource,
+                      );
+
+                      return BlocProvider(
+                        create: (_) => PostDetailBloc(
+                          getHomePost: GetHomePostUsecase(postRepository),
+                          createTransaction:
+                              CreateTransactionUsecase(transactionRepository),
+                          sendReport: SendHomeReportUsecase(reportRepository),
+                        ),
+                        child: PostDetailScreen(
+                          postId: postId,
+                          currentUserId: userId,
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: AppRoutePaths.post,
-                name: AppRouteNames.post,
+                path: AppRoutePaths.upload,
+                name: AppRouteNames.upload,
                 builder: (context, state) => BlocBuilder<AuthBloc, AuthState>(
                   bloc: authBloc,
                   builder: (context, authState) {
@@ -129,7 +221,36 @@ GoRouter createAppRouter(
               GoRoute(
                 path: AppRoutePaths.transaction,
                 name: AppRouteNames.transaction,
-                builder: (context, state) => const TransactionScreen(),
+                builder: (context, state) =>
+                    BlocBuilder<AuthBloc, AuthState>(
+                  bloc: authBloc,
+                  builder: (context, authState) {
+                    final user = switch (authState) {
+                      AuthLoginState(:final user) => user,
+                      AuthSignUpState(:final user) => user,
+                      _ => null,
+                    };
+                    if (user == null) return const SizedBox.shrink();
+
+                    final datasource = TransactionRemoteDatasourceImpl(
+                      TransactionServices(userId: user.id),
+                    );
+                    final repository = TransactionRepositoryImpl(
+                      remoteDatasource: datasource,
+                    );
+
+                    return BlocProvider(
+                      key: ValueKey(user.id),
+                      create: (_) => TransactionBloc(
+                        getTransactions:
+                            GetTransactionsUsecase(repository: repository),
+                        completeTransaction:
+                            CompleteTransactionUsecase(repository),
+                      ),
+                      child: TransactionScreen(currentUserId: user.id,),
+                    );
+                  },
+                ),
               ),
             ],
           ),

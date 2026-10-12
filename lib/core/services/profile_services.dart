@@ -1,13 +1,13 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileServices {
-  ProfileServices({SupabaseClient? client})
-    : _client = client ?? Supabase.instance.client;
+  ProfileServices({SupabaseClient? client}) : _client = client;
 
-  final SupabaseClient _client;
+  final SupabaseClient? _client;
+  SupabaseClient get _activeClient => _client ?? Supabase.instance.client;
 
   Future<Map<String, dynamic>?> getProfile({required String userId}) async {
-    return await _client
+    return await _activeClient
         .from('sinh_vien')
         .select(
           'sinhvien_id,msv,ho_ten,email_neu,so_dien_thoai,diem_uy_tin,so_lan_huy_don',
@@ -17,6 +17,6 @@ class ProfileServices {
   }
 
   Future<void> saveProfile({required Map<String, dynamic> profile}) async {
-    await _client.from('sinh_vien').upsert(profile, onConflict: 'sinhvien_id');
+    await _activeClient.from('sinh_vien').upsert(profile, onConflict: 'sinhvien_id');
   }
 }

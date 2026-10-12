@@ -1,4 +1,4 @@
-﻿/// Tên route cho [GoRoute.name], context.pushNamed, context.goNamed.
+/// Tên route cho [GoRoute.name], context.pushNamed, context.goNamed.
 abstract final class AppRouteNames {
   AppRouteNames._();
 
@@ -7,7 +7,8 @@ abstract final class AppRouteNames {
   static const forgotPassword = 'forgot-password';
 
   static const appHome = 'app-home';
-  static const post = 'post';
+  static const postDetail = 'post-detail';
+  static const upload = 'upload';
   static const transaction = 'transaction';
   static const profile = 'profile';
   static const profileSetup = 'profile-setup';

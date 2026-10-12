@@ -13,7 +13,8 @@ abstract final class AppRoutePaths {
   static const app = '/app';
 
   static const appHome = '/app/home';
-  static const post = '/app/post';
+  static const postDetail = '/app/home/post/:id';
+  static const upload = '/app/upload';
   static const transaction = '/app/transaction';
   static const profile = '/app/profile';
   static const profileSetup = '/app/profile/setup';

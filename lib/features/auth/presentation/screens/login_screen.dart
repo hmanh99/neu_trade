@@ -76,18 +76,17 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 24),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 48),
                   Text(
-                    'hey_there',
+                    'Hi,',
                     style: const TextStyle(
                       fontSize: 16,
                       color: ColorConstants.textSecondaryColor,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   Text(
-                    'welcome_back',
+                    'Đăng nhập',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -102,19 +101,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         TextFormField(
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'email_required';
+                              return 'Yêu cầu nhập email';
                             }
                             if (!RegExp(
                               r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
                             ).hasMatch(value)) {
-                              return 'email_invalid';
+                              return 'Email không hợp lệ';
                             }
                             return null;
                           },
                           controller: _email,
                           enabled: !isLoading,
                           decoration: InputDecoration(
-                            hintText: 'email_hint',
+                            hintText: 'example@example.com',
                             prefixIcon: const Icon(Icons.email),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -127,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         TextFormField(
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'password_required';
+                              return 'Yêu cầu nhập mật khẩu';
                             }
                             return null;
                           },
@@ -136,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           obscureText: _obscurePassword,
                           keyboardType: TextInputType.text,
                           decoration: InputDecoration(
-                            hintText: 'password_hint',
+                            hintText: '',
                             prefixIcon: const Icon(Icons.lock),
                             suffixIcon: IconButton(
                               onPressed: () {
@@ -168,10 +167,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                   },
                                 ),
                           child: Text(
-                            'forgot_password_link',
+                            'Quên mật khẩu',
                             style: const TextStyle(
                               color: ColorConstants.textSecondaryColor,
-                              fontSize: 13,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                               decoration: TextDecoration.underline,
                               height: 1.50,
@@ -200,7 +199,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     color: ColorConstants.buttonTextColor,
                                   ),
                                 )
-                              : Text('login_button'),
+                              : Text('Đăng nhập'),
                         ),
                       ],
                     ),
@@ -213,7 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Padding(
                         padding: const EdgeInsets.all(12),
                         child: Text(
-                          'or_divider',
+                          'hoặc',
                           style: const TextStyle(
                             color: ColorConstants.textSecondaryColor,
                             fontSize: 13,
@@ -245,9 +244,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                         children: [
-                          TextSpan(text: 'no_account_prompt'),
+                          TextSpan(text: 'Chưa có tài khoản? '),
                           TextSpan(
-                            text: 'sign_up_button',
+                            text: 'Đăng kí ngay',
                             style: const TextStyle(
                               color: ColorConstants.textHighlightColor,
                             ),

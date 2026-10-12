@@ -71,11 +71,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 24),
-                  const SizedBox(height: 24),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 48),
                   Text(
-                    'hey_there',
+                    'Hi,',
                     style: const TextStyle(
                       fontSize: 16,
                       color: ColorConstants.textSecondaryColor,
@@ -83,7 +81,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'create_an_account',
+                    'Tạo tài khoản',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -97,19 +95,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         TextFormField(
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'email_required';
+                              return 'Yêu cầu nhập email';
                             }
                             if (!RegExp(
                               r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
                             ).hasMatch(value)) {
-                              return 'email_invalid';
+                              return 'Email không hợp lệ';
                             }
                             return null;
                           },
                           controller: _email,
                           enabled: !isLoading,
                           decoration: InputDecoration(
-                            hintText: 'email_hint',
+                            hintText: 'example@example.com',
                             prefixIcon: const Icon(Icons.email),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -122,31 +120,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         TextFormField(
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'password_required';
+                              return 'Yêu cầu nhập mật khẩu';
                             }
                             if (value.length < 8) {
-                              return 'password_min_length';
+                              return 'Mật khẩu tối thiểu 8 kí tự';
                             }
                             if (!RegExp(r'[A-Z]').hasMatch(value)) {
-                              return 'password_uppercase';
-                            }
-                            if (!RegExp(r'[a-z]').hasMatch(value)) {
-                              return 'password_lowercase';
+                              return 'Mật khẩu cần ít nhất 1 chữ in hoa';
                             }
                             if (!RegExp(r'[0-9]').hasMatch(value)) {
-                              return 'password_number';
+                              return 'Mật khẩu cần ít nhất 1 chữ số';
                             }
                             if (!RegExp(
                               r'[!@#\/$%^&*(),.?":{}|<>]',
                             ).hasMatch(value)) {
-                              return 'password_special_char';
+                              return 'Mật khẩu cần ít nhất 1 kí tự đặc biệt';
                             }
                             return null;
                           },
                           controller: _password,
                           enabled: !isLoading,
                           decoration: InputDecoration(
-                            hintText: 'password_hint',
+                            hintText: '',
                             prefixIcon: const Icon(Icons.lock),
                             suffixIcon: IconButton(
                               onPressed: () {
@@ -168,7 +163,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           keyboardType: TextInputType.text,
                         ),
 
-                        const SizedBox(height: 150),
+                        const SizedBox(height: 172),
 
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
@@ -201,7 +196,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     color: ColorConstants.buttonColor,
                                   ),
                                 )
-                              : Text('sign_up_button'),
+                              : Text('Đăng kí'),
                         ),
                       ],
                     ),
@@ -214,7 +209,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Padding(
                         padding: const EdgeInsets.all(12),
                         child: Text(
-                          'or_divider',
+                          'hoặc',
                           style: const TextStyle(
                             color: ColorConstants.textSecondaryColor,
                             fontSize: 13,
@@ -246,9 +241,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                         children: [
-                          TextSpan(text: 'have_account_prompt'),
+                          TextSpan(text: 'Đã có tài khoản? '),
                           TextSpan(
-                            text: 'login_button',
+                            text: 'Đăng nhập ngay',
                             style: const TextStyle(
                               color: ColorConstants.textHighlightColor,
                             ),
