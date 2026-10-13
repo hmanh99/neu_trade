@@ -32,7 +32,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   @override
   void initState() {
     super.initState();
-    _studentId = TextEditingController();
+    _studentId = TextEditingController(text: widget.initialEmail.substring(0, 8));
     _fullName = TextEditingController();
     _email = TextEditingController(text: widget.initialEmail);
     _phone = TextEditingController();

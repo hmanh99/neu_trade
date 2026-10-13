@@ -43,8 +43,10 @@ class AuthLoginState extends AuthAuthenticatedState {
   List<Object?> get props => [user];
 }
 
-class AuthSignUpState extends AuthAuthenticatedState {
-  final UserEntity user; // FIX: same as above
+/// Account creation succeeded. This is deliberately not an authenticated
+/// state: the user must sign in from the login screen after registering.
+class AuthSignUpState extends AuthState {
+  final UserEntity user;
 
   const AuthSignUpState({required this.user});
 

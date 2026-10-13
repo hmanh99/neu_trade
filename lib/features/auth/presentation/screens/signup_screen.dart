@@ -10,7 +10,7 @@ import 'package:neu_trade/features/auth/presentation/bloc/auth_state.dart';
 class SignUpScreen extends StatefulWidget {
   final String returnTo;
 
-  const SignUpScreen({super.key, this.returnTo = AppRoutePaths.appHome});
+  const SignUpScreen({super.key, this.returnTo = AppRoutePaths.login});
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -44,6 +44,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthSignUpState) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text("Đăng kí thành công!")));
+
           context.go(widget.returnTo);
 
           _email.clear();
@@ -178,7 +182,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ? null
                               : () {
                                   if (_formKey.currentState!.validate()) {
-
                                     context.read<AuthBloc>().add(
                                       AuthSignUpEvent(
                                         email: _email.text.trim(),
@@ -228,7 +231,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             Uri(
                               path: AppRoutePaths.login,
                               queryParameters:
-                                  widget.returnTo == AppRoutePaths.appHome
+                                  widget.returnTo == AppRoutePaths.login
                                   ? null
                                   : {'from': widget.returnTo},
                             ).toString(),

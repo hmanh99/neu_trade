@@ -26,6 +26,8 @@ class AuthServices {
         throw CustomAuthException(message: 'Sign-up failed: no user returned.');
       }
 
+      await _client.auth.signOut();
+
       return user;
     } on CustomAuthException {
       rethrow;

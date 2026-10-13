@@ -112,7 +112,6 @@ GoRouter createAppRouter(
                   builder: (context, authState) {
                     final user = switch (authState) {
                       AuthLoginState(:final user) => user,
-                      AuthSignUpState(:final user) => user,
                       _ => null,
                     };
                     if (user == null) return const SizedBox.shrink();
@@ -141,7 +140,6 @@ GoRouter createAppRouter(
                       final authState = authBloc.state;
                       final user = switch (authState) {
                         AuthLoginState(:final user) => user,
-                        AuthSignUpState(:final user) => user,
                         _ => null,
                       };
                       final userId = user?.id ?? '';
@@ -196,7 +194,6 @@ GoRouter createAppRouter(
                   builder: (context, authState) {
                     final user = switch (authState) {
                       AuthLoginState(:final user) => user,
-                      AuthSignUpState(:final user) => user,
                       _ => null,
                     };
                     if (user == null) return const SizedBox.shrink();
@@ -227,7 +224,6 @@ GoRouter createAppRouter(
                   builder: (context, authState) {
                     final user = switch (authState) {
                       AuthLoginState(:final user) => user,
-                      AuthSignUpState(:final user) => user,
                       _ => null,
                     };
                     if (user == null) return const SizedBox.shrink();
@@ -264,7 +260,6 @@ GoRouter createAppRouter(
                   builder: (context, authState) {
                     final user = switch (authState) {
                       AuthLoginState(:final user) => user,
-                      AuthSignUpState(:final user) => user,
                       _ => null,
                     };
                     // The auth guard redirects guests. Never retain another account's UI.
@@ -293,7 +288,6 @@ GoRouter createAppRouter(
           final authState = authBloc.state;
           final user = switch (authState) {
             AuthLoginState(:final user) => user,
-            AuthSignUpState(:final user) => user,
             _ => throw StateError('Authenticated user is required.'),
           };
 

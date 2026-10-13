@@ -70,9 +70,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (currentState is AuthLoginState && currentState.user.id == user.id) {
         return;
       }
-      if (currentState is AuthSignUpState && currentState.user.id == user.id) {
-        return;
-      }
       emit(AuthLoginState(user: user));
     });
 
