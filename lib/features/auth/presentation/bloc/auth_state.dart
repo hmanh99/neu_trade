@@ -36,11 +36,15 @@ class AuthLoginState extends AuthAuthenticatedState {
   // FIX: changed UserModel → UserEntity (domain states must depend on
   //      domain types only, never on data-layer models).
   final UserEntity user;
+  final bool isProfileCompleted;
 
-  const AuthLoginState({required this.user});
+  const AuthLoginState({
+    required this.user,
+    this.isProfileCompleted = false,
+  });
 
   @override
-  List<Object?> get props => [user];
+  List<Object?> get props => [user, isProfileCompleted];
 }
 
 /// Account creation succeeded. This is deliberately not an authenticated

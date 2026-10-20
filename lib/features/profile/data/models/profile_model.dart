@@ -9,6 +9,7 @@ class ProfileModel extends UserProfile {
     required super.phone,
     super.reputationScore,
     super.cancelledOrderCount,
+    required super.isCompleted,
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
@@ -20,6 +21,7 @@ class ProfileModel extends UserProfile {
       phone: json['so_dien_thoai'] as String,
       reputationScore: _readScore(json['diem_uy_tin']),
       cancelledOrderCount: (json['so_lan_huy_don'] as num?)?.toInt(),
+      isCompleted: (json['is_completed'] as bool?) ?? false,
     );
   }
 
@@ -32,6 +34,7 @@ class ProfileModel extends UserProfile {
       phone: profile.phone,
       reputationScore: profile.reputationScore,
       cancelledOrderCount: profile.cancelledOrderCount,
+      isCompleted: profile.isCompleted,
     );
   }
 
@@ -43,7 +46,7 @@ class ProfileModel extends UserProfile {
       email: email,
       phone: phone,
       reputationScore: reputationScore,
-      cancelledOrderCount: cancelledOrderCount,
+      cancelledOrderCount: cancelledOrderCount, isCompleted: isCompleted,
     );
   }
 
@@ -60,5 +63,6 @@ class ProfileModel extends UserProfile {
     'ho_ten': fullName,
     'email_neu': email,
     'so_dien_thoai': phone,
+    'is_completed' : isCompleted
   };
 }

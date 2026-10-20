@@ -12,6 +12,7 @@ import 'package:neu_trade/features/profile/presentation/widgets/profile_field.da
 
 import '../widgets/profile_message.dart';
 import '../widgets/stat.dart';
+import 'package:neu_trade/core/services/profile_services.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -44,8 +45,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Xác nhận đăng xuất'),
-        content: const Text('Bạn có chắc chắn muốn đăng xuất không?'),
+        title: const Text(
+          'Xác nhận đăng xuất',
+          style: TextStyle(fontWeight: FontWeight.w700),
+        ),
+        content: const Text(
+          'Bạn có chắc chắn muốn đăng xuất khỏi tài khoản không?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -54,7 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           FilledButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: FilledButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: ColorConstants.errorColor,
             ),
             child: const Text('Đăng xuất'),
           ),
@@ -75,7 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(authState.message),
-              backgroundColor: Colors.red,
+              backgroundColor: ColorConstants.snackBarFailedColor,
             ),
           );
         }
@@ -87,9 +93,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
               state is ProfileLoadingState ||
               state is ProfileSavingState;
           return Scaffold(
-            backgroundColor: const Color(0xFFF5F7FB),
+            backgroundColor: ColorConstants.backgroundColor,
             appBar: AppBar(
-              title: const Text('Hồ sơ'),
+              backgroundColor: Colors.white,
+              elevation: 0,
+              title: const Text(
+                'Hồ sơ sinh viên',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: ColorConstants.textPrimaryColor,
+                  letterSpacing: -0.4,
+                ),
+              ),
               automaticallyImplyLeading: false,
               actions: [
                 IconButton(
@@ -126,6 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       }
       return RefreshIndicator(
+        color: ColorConstants.primaryColor,
         onRefresh: _reload,
         child: ListView(
           key: const PageStorageKey('profile-scroll'),
@@ -136,15 +153,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 24),
             const Text(
               'Thông tin sinh viên',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: ColorConstants.textPrimaryColor,
+                letterSpacing: -0.3,
+              ),
             ),
             const SizedBox(height: 12),
-            Card(
-              elevation: 0,
-              color: Colors.white,
-              margin: EdgeInsets.zero,
-              shape: RoundedRectangleBorder(
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: ColorConstants.borderLightColor),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x060F172A),
+                    blurRadius: 12,
+                    offset: Offset(0, 4),
+                  ),
+                ],
               ),
               child: Column(
                 children: [
@@ -153,19 +181,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     label: 'Mã sinh viên',
                     value: profile.studentId,
                   ),
-                  const Divider(height: 1, indent: 56, endIndent: 16),
+                  const Divider(color: ColorConstants.dividerColor),
                   ProfileField(
                     icon: Icons.person_outline,
                     label: 'Họ và tên',
                     value: profile.fullName,
                   ),
-                  const Divider(height: 1, indent: 56, endIndent: 16),
+                  const Divider(color: ColorConstants.dividerColor),
                   ProfileField(
                     icon: Icons.phone_outlined,
                     label: 'Số điện thoại',
                     value: profile.phone,
                   ),
-                  const Divider(height: 1, indent: 56, endIndent: 16),
+                  const Divider(color: ColorConstants.dividerColor),
                   ProfileField(
                     icon: Icons.alternate_email,
                     label: 'Email sinh viên',
@@ -174,30 +202,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 24),
             InkWell(
               onTap: _confirmSignOut,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(14),
               child: Container(
                 width: double.infinity,
                 height: 50,
                 decoration: BoxDecoration(
-                  color: ColorConstants.buttonColor,
-                  borderRadius: BorderRadius.circular(12),
+                  color: ColorConstants.redShade50,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: ColorConstants.redShade100),
                 ),
-                child: Center(
-                  child: Text(
-                    "Đăng xuất",
-                    style: TextStyle(color: ColorConstants.buttonTextColor),
-                  ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.logout_rounded,
+                      color: ColorConstants.errorColor,
+                      size: 20,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      "Đăng xuất",
+                      style: TextStyle(
+                        color: ColorConstants.errorColor,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
+            const SizedBox(height: 20),
           ],
         ),
       );
     }
-    return const Center(child: CircularProgressIndicator());
+    return const Center(
+      child: CircularProgressIndicator(color: ColorConstants.primaryColor),
+    );
   }
 }
 
@@ -224,22 +269,55 @@ class _ProfileHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary,
+        gradient: ColorConstants.primaryGradient,
         borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: ColorConstants.primaryColor.withValues(alpha: 0.35),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         children: [
-          CircleAvatar(
-            radius: 36,
-            backgroundColor: Colors.white,
-            child: Text(
-              _initials,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontSize: 26,
-                fontWeight: FontWeight.w800,
+          Stack(
+            alignment: Alignment.bottomRight,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 3),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x1F000000),
+                      blurRadius: 12,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: CircleAvatar(
+                  radius: 36,
+                  backgroundColor: Colors.white,
+                  child: Text(
+                    _initials,
+                    style: const TextStyle(
+                      color: ColorConstants.primaryColor,
+                      fontSize: 26,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
               ),
-            ),
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  color: ColorConstants.green,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.check, size: 13, color: Colors.white),
+              ),
+            ],
           ),
           const SizedBox(height: 14),
           Text(
@@ -247,46 +325,72 @@ class _ProfileHeader extends StatelessWidget {
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 23,
+              fontSize: 22,
               fontWeight: FontWeight.w800,
+              letterSpacing: -0.3,
             ),
           ),
-          const SizedBox(height: 24),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final stats = [
-                Stat(
-                  value:
-                      profile.reputationScore?.toStringAsFixed(2) ??
-                      'Chưa có dữ liệu',
-                  label: 'Điểm uy tín',
-                ),
-                Stat(
-                  value:
-                      profile.cancelledOrderCount?.toString() ??
-                      'Chưa có dữ liệu',
-                  label: 'Số lần hủy đơn',
-                ),
-              ];
-              if (constraints.maxWidth < 260 ||
-                  MediaQuery.textScalerOf(context).scale(14) > 20) {
-                return Column(
-                  children: [stats[0], const SizedBox(height: 20), stats[1]],
+          const SizedBox(height: 4),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              'MSV: ${profile.studentId}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(height: 22),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+            ),
+            child: FutureBuilder<Map<String, dynamic>?>(
+              future: ProfileServices()
+                  .getUserPublicStats(userId: profile.userId)
+                  .catchError((_) => null),
+              builder: (context, snapshot) {
+                final rating =
+                    snapshot.data?['diem_trung_binh']?.toString() ?? '5.0';
+                final count =
+                    snapshot.data?['tong_danh_gia']?.toString() ?? '0';
+                final cancelCount =
+                    snapshot.data?['so_lan_huy_don']?.toString() ??
+                        profile.cancelledOrderCount?.toString() ??
+                        '0';
+                final stats = [
+                  Stat(value: '$rating★ ($count)', label: 'Đánh giá'),
+                  Stat(
+                    value: cancelCount,
+                    label: 'Hủy đơn',
+                  ),
+                ];
+                return Row(
+                  children: [
+                    Expanded(child: stats[0]),
+                    Container(
+                      height: 36,
+                      width: 1,
+                      color: Colors.white.withValues(alpha: 0.2),
+                    ),
+                    Expanded(child: stats[1]),
+                  ],
                 );
-              }
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(child: stats[0]),
-                  const SizedBox(width: 12),
-                  Expanded(child: stats[1]),
-                ],
-              );
-            },
+              },
+            ),
+
           ),
         ],
       ),
     );
   }
 }
-

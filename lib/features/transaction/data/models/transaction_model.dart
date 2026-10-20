@@ -19,6 +19,11 @@ class TransactionModel extends TransactionEntity {
     required super.status,
     super.note,
     super.imageUrls,
+    super.hasReviewed,
+    super.myStars,
+    super.cancelledById,
+    super.cancelReason,
+    super.cancelledAt,
   });
 
   /// Parse from RPC responses or joined queries.
@@ -60,6 +65,13 @@ class TransactionModel extends TransactionEntity {
       ),
       note: json['note'] as String?,
       imageUrls: _parseImageUrls(rawImages),
+      hasReviewed: json['da_danh_gia'] as bool? ?? false,
+      myStars: (json['so_sao_cua_toi'] as num?)?.toInt(),
+      cancelledById: json['nguoi_huy_id'] as String?,
+      cancelReason: json['ly_do_huy'] as String?,
+      cancelledAt: json['thoi_gian_huy'] != null
+          ? DateTime.parse(json['thoi_gian_huy'] as String)
+          : null,
     );
   }
 
@@ -82,6 +94,11 @@ class TransactionModel extends TransactionEntity {
     status: status,
     note: note,
     imageUrls: imageUrls,
+    hasReviewed: hasReviewed,
+    myStars: myStars,
+    cancelledById: cancelledById,
+    cancelReason: cancelReason,
+    cancelledAt: cancelledAt,
   );
 
   static List<String> _parseImageUrls(Object? value) {

@@ -32,6 +32,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         fullName: event.fullName,
         email: event.email,
         phone: event.phone,
+        isCompleted: event.isCompleted,
       );
       final result = await _saveProfile(SaveProfileParams(profile: profile));
       result.fold(

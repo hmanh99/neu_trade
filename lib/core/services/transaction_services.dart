@@ -71,4 +71,21 @@ class TransactionServices {
     );
     return Map<String, dynamic>.from(result as Map);
   }
+
+  /// Cancel a transaction (buyer or seller can cancel while in DangGiuCho).
+  Future<Map<String, dynamic>> cancelTransaction({
+    required int transactionId,
+    String? reason,
+  }) async {
+    _requireSession();
+    final result = await _client.rpc(
+      'cancel_transaction',
+      params: {
+        'p_giaodich_id': transactionId,
+        'p_ly_do': reason,
+      },
+    );
+    return Map<String, dynamic>.from(result as Map);
+  }
 }
+

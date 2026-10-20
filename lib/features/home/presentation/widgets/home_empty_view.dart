@@ -22,29 +22,39 @@ class HomeEmptyView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: ColorConstants.greyShade100,
+              padding: const EdgeInsets.all(22),
+              decoration: const BoxDecoration(
+                color: ColorConstants.primaryLightBg,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.search_off_rounded,
-                size: 48,
-                color: ColorConstants.greyShade400,
+                size: 44,
+                color: ColorConstants.primaryColor,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
+            const Text(
+              'Không tìm thấy tài liệu',
+              style: TextStyle(
+                fontSize: 16.5,
+                fontWeight: FontWeight.w700,
+                color: ColorConstants.textPrimaryColor,
+              ),
+            ),
+            const SizedBox(height: 6),
             Text(
               message,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 15,
-                color: ColorConstants.greyShade600,
+                fontSize: 13.5,
+                color: ColorConstants.textSecondaryColor,
                 fontWeight: FontWeight.w500,
+                height: 1.4,
               ),
             ),
             if (actionLabel != null && onAction != null) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               OutlinedButton.icon(
                 onPressed: onAction,
                 icon: const Icon(Icons.refresh_rounded, size: 18),
@@ -52,6 +62,7 @@ class HomeEmptyView extends StatelessWidget {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: ColorConstants.primaryColor,
                   side: const BorderSide(color: ColorConstants.primaryColor),
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

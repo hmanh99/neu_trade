@@ -15,6 +15,11 @@ abstract class TransactionRemoteDatasource {
   Future<TransactionModel> getTransaction({required int transactionId});
 
   Future<TransactionModel> completeTransaction({required int transactionId});
+
+  Future<TransactionModel> cancelTransaction({
+    required int transactionId,
+    String? reason,
+  });
 }
 
 class TransactionRemoteDatasourceImpl implements TransactionRemoteDatasource {
@@ -71,6 +76,22 @@ class TransactionRemoteDatasourceImpl implements TransactionRemoteDatasource {
     try {
       final result = await _transactionServices.completeTransaction(
         transactionId: transactionId,
+      );
+      return TransactionModel.fromJson(result);
+    } on PostgrestException catch (error) {
+      throw ServerException(message: error.message);
+    }
+  }
+
+  @override
+  Future<TransactionModel> cancelTransaction({
+    required int transactionId,
+    String? reason,
+  }) async {
+    try {
+      final result = await _transactionServices.cancelTransaction(
+        transactionId: transactionId,
+        reason: reason,
       );
       return TransactionModel.fromJson(result);
     } on PostgrestException catch (error) {

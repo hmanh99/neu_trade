@@ -113,21 +113,22 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
               if (!isOwner)
                 IconButton(
                   tooltip: 'Báo cáo bài đăng',
-                  onPressed: state is PostDetailReportingState ||
+                  onPressed:
+                      state is PostDetailReportingState ||
                           state is PostDetailReportSuccessState
                       ? null
                       : () => ReportPostBottomSheet.show(
-                            context: context,
-                            onSubmit: (reason, description) {
-                              context.read<PostDetailBloc>().add(
-                                PostDetailReportSubmitted(
-                                  postId: post.id,
-                                  reason: reason,
-                                  description: description,
-                                ),
-                              );
-                            },
-                          ),
+                          context: context,
+                          onSubmit: (reason, description) {
+                            context.read<PostDetailBloc>().add(
+                              PostDetailReportSubmitted(
+                                postId: post.id,
+                                reason: reason,
+                                description: description,
+                              ),
+                            );
+                          },
+                        ),
                   icon: state is PostDetailReportingState
                       ? const SizedBox.square(
                           dimension: 20,
@@ -152,13 +153,20 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                       // Header card
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
-                          color: ColorConstants.white,
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: ColorConstants.greyShade200,
+                            color: ColorConstants.borderLightColor,
                           ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x050F172A),
+                              blurRadius: 10,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,11 +177,12 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w800,
-                                color: ColorConstants.greyShade900,
+                                color: ColorConstants.textPrimaryColor,
                                 height: 1.3,
+                                letterSpacing: -0.3,
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 10),
 
                             // Price
                             Text(
@@ -181,21 +190,49 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                 post.document.price,
                               ),
                               style: const TextStyle(
-                                fontSize: 22,
+                                fontSize: 23,
                                 fontWeight: FontWeight.w900,
                                 color: ColorConstants.primaryColor,
+                                letterSpacing: -0.5,
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 8),
 
                             // Document full name if different from title
                             if (post.document.name.trim() !=
                                 post.title.trim()) ...[
-                              Text(
-                                'Tên sách: ${post.document.name}',
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: ColorConstants.greyShade700,
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: ColorConstants.greyShade50,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: ColorConstants.borderLightColor,
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.menu_book_rounded,
+                                      size: 16,
+                                      color: ColorConstants.textSecondaryColor,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Expanded(
+                                      child: Text(
+                                        'Tên sách: ${post.document.name}',
+                                        style: const TextStyle(
+                                          fontSize: 12.5,
+                                          fontWeight: FontWeight.w500,
+                                          color:
+                                              ColorConstants.textSecondaryColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
@@ -209,6 +246,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                         authorName: post.authorName,
                         createdAt: post.createdAt,
                         address: post.address,
+                        authorId: post.authorId,
                         onContactTap: isOwner
                             ? null
                             : () {
@@ -235,31 +273,48 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                           post.description!.trim().isNotEmpty) ...[
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(18),
                           decoration: BoxDecoration(
-                            color: ColorConstants.white,
+                            color: Colors.white,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: ColorConstants.greyShade200,
+                              color: ColorConstants.borderLightColor,
                             ),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x050F172A),
+                                blurRadius: 10,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Mô tả bài đăng',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                  color: ColorConstants.greyShade900,
-                                ),
+                              const Row(
+                                children: [
+                                  Icon(
+                                    Icons.notes_rounded,
+                                    size: 18,
+                                    color: ColorConstants.primaryColor,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Mô tả bài đăng',
+                                    style: TextStyle(
+                                      fontSize: 15.5,
+                                      fontWeight: FontWeight.w700,
+                                      color: ColorConstants.textPrimaryColor,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 12),
                               Text(
                                 post.description!.trim(),
                                 style: const TextStyle(
                                   fontSize: 14,
-                                  color: ColorConstants.greyShade800,
+                                  color: ColorConstants.textSecondaryColor,
                                   height: 1.5,
                                 ),
                               ),

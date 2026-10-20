@@ -17,6 +17,8 @@ import 'features/auth/presentation/bloc/auth_event.dart';
 import 'package:neu_trade/features/profile/data/datasources/profile_remote_datasource.dart';
 import 'package:neu_trade/features/profile/data/repositories/profile_repository_impl.dart';
 import 'package:neu_trade/features/profile/domain/repositories/profile_repository.dart';
+import 'package:neu_trade/features/profile/domain/usecases/get_profile_use_case.dart';
+import 'package:neu_trade/core/theme/app_theme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -25,6 +27,10 @@ Future<void> main() async {
   await Supabase.initialize(
     url: AppConfig.supabaseURL,
     publishableKey: AppConfig.publishableKey,
+  );
+
+  final profileRepository = ProfileRepositoryImpl(
+    remoteDatasource: ProfileRemoteDataSourceImpl(ProfileServices()),
   );
 
   final datasource = AuthRemoteDataSourceImpl(AuthServices());
@@ -36,11 +42,8 @@ Future<void> main() async {
     forgotPassword: ForgotPasswordUseCase(repository),
     logout: LogoutUseCase(repository),
     watchAuthState: WatchAuthStateUseCase(repository),
+    getProfile: GetProfileUseCase(profileRepository),
   )..add(const AuthSessionRestoreRequested());
-
-  final profileRepository = ProfileRepositoryImpl(
-    remoteDatasource: ProfileRemoteDataSourceImpl(ProfileServices()),
-  );
 
   runApp(
     MyApp(
@@ -72,10 +75,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp.router(
         title: 'NEU Trade',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          useMaterial3: true,
-        ),
+        theme: AppTheme.lightTheme,
         routerConfig: _router,
       ),
     );

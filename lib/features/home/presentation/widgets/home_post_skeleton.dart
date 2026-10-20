@@ -20,7 +20,7 @@ class _HomePostSkeletonState extends State<HomePostSkeleton>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     )..repeat(reverse: true);
-    _animation = Tween<double>(begin: 0.3, end: 0.7).animate(
+    _animation = Tween<double>(begin: 0.35, end: 0.75).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
   }
@@ -36,7 +36,7 @@ class _HomePostSkeletonState extends State<HomePostSkeleton>
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
-        final shimmerColor = ColorConstants.greyShade300.withAlpha(
+        final shimmerColor = ColorConstants.greyShade200.withAlpha(
           (_animation.value * 255).round(),
         );
 
@@ -44,12 +44,19 @@ class _HomePostSkeletonState extends State<HomePostSkeleton>
           children: List.generate(
             4,
             (index) => Container(
-              margin: const EdgeInsets.only(bottom: 14),
+              margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: ColorConstants.white,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: ColorConstants.greyShade200),
+                border: Border.all(color: ColorConstants.borderLightColor),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x040F172A),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
               ),
               child: Row(
                 children: [
@@ -61,7 +68,7 @@ class _HomePostSkeletonState extends State<HomePostSkeleton>
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +80,7 @@ class _HomePostSkeletonState extends State<HomePostSkeleton>
                               height: 16,
                               decoration: BoxDecoration(
                                 color: shimmerColor,
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(6),
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -82,7 +89,7 @@ class _HomePostSkeletonState extends State<HomePostSkeleton>
                               height: 16,
                               decoration: BoxDecoration(
                                 color: shimmerColor,
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(6),
                               ),
                             ),
                           ],
@@ -93,16 +100,16 @@ class _HomePostSkeletonState extends State<HomePostSkeleton>
                           height: 16,
                           decoration: BoxDecoration(
                             color: shimmerColor,
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 8),
                         Container(
                           width: 140,
                           height: 16,
                           decoration: BoxDecoration(
                             color: shimmerColor,
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -111,7 +118,7 @@ class _HomePostSkeletonState extends State<HomePostSkeleton>
                           height: 18,
                           decoration: BoxDecoration(
                             color: shimmerColor,
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                         ),
                       ],

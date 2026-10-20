@@ -47,7 +47,7 @@ class AuthServices {
 
       final User? user = response.user;
       if (user == null) {
-        throw CustomAuthException(message: 'User not found.');
+        throw CustomAuthException(message: 'Người dùng không tồn tại');
       }
 
       return user;

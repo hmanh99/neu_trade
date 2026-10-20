@@ -47,40 +47,50 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    width: 44,
+                    height: 44,
                     decoration: BoxDecoration(
-                      color: ColorConstants.blue.withAlpha(25),
-                      borderRadius: BorderRadius.circular(12),
+                      gradient: ColorConstants.primaryGradient,
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: ColorConstants.primaryColor.withValues(alpha: 0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: const Icon(
                       Icons.school_rounded,
-                      color: ColorConstants.primaryColor,
+                      color: Colors.white,
                       size: 24,
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'NEU Trade',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 19,
                             fontWeight: FontWeight.w800,
-                            color: ColorConstants.primaryColor,
+                            color: ColorConstants.textPrimaryColor,
                             letterSpacing: -0.5,
                           ),
                         ),
-                        Text(
-                          'Nơi trao đổi tài liệu sinh viên',
+                        const SizedBox(height: 2),
+                        const Text(
+                          'Sàn trao đổi tài liệu sinh viên',
                           style: TextStyle(
                             fontSize: 12,
-                            color: ColorConstants.greyShade800,
+                            fontWeight: FontWeight.w500,
+                            color: ColorConstants.textSecondaryColor,
                           ),
                         ),
                       ],

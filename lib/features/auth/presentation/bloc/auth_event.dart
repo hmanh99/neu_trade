@@ -60,3 +60,7 @@ class AuthForgotPasswordEvent extends AuthEvent {
 class AuthSignOutEvent extends AuthEvent {
   const AuthSignOutEvent();
 }
+
+class AuthProfileCompletedEvent extends AuthEvent {
+  const AuthProfileCompletedEvent();
+}

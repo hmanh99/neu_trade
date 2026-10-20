@@ -23,7 +23,7 @@ class CategoryFilterBar extends StatelessWidget {
         children: [
           _buildFilterChip(
             label: 'Tất cả',
-            icon: Icons.apps_rounded,
+            icon: Icons.grid_view_rounded,
             isSelected: selectedCategory == null,
             onTap: () => onCategorySelected(null),
           ),
@@ -52,44 +52,59 @@ class CategoryFilterBar extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Material(
-      color: ColorConstants.transparent,
+      color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: isSelected
-                ? ColorConstants.primaryColor
-                : ColorConstants.white,
-            borderRadius: BorderRadius.circular(20),
+            gradient: isSelected ? ColorConstants.primaryGradient : null,
+            color: isSelected ? null : Colors.white,
+            borderRadius: BorderRadius.circular(22),
             border: Border.all(
               color: isSelected
-                  ? ColorConstants.primaryColor
-                  : ColorConstants.greyShade300,
+                  ? Colors.transparent
+                  : ColorConstants.borderLightColor,
               width: 1,
             ),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: ColorConstants.primaryColor.withValues(alpha: 0.28),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ]
+                : const [
+                    BoxShadow(
+                      color: Color(0x040F172A),
+                      blurRadius: 4,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 icon,
-                size: 16,
+                size: 15,
                 color: isSelected
-                    ? ColorConstants.white
-                    : ColorConstants.greyShade700,
+                    ? Colors.white
+                    : ColorConstants.primaryColor,
               ),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                  fontSize: 12.5,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                   color: isSelected
-                      ? ColorConstants.white
-                      : ColorConstants.greyShade800,
+                      ? Colors.white
+                      : ColorConstants.textPrimaryColor,
                 ),
               ),
             ],
@@ -102,13 +117,13 @@ class CategoryFilterBar extends StatelessWidget {
   IconData _getCategoryIcon(Category category) {
     switch (category) {
       case Category.giaoTrinh:
-        return Icons.menu_book_rounded;
+        return Icons.auto_stories_rounded;
       case Category.doAn:
-        return Icons.assignment_outlined;
+        return Icons.feed_rounded;
       case Category.slideIn:
-        return Icons.slideshow_rounded;
+        return Icons.co_present_rounded;
       case Category.sachBaiTap:
-        return Icons.edit_note_rounded;
+        return Icons.edit_calendar_rounded;
     }
   }
 }

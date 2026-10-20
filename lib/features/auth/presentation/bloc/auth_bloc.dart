@@ -10,6 +10,7 @@ import 'package:neu_trade/features/auth/domain/usecases/sign_up_use_case.dart';
 import 'package:neu_trade/features/auth/domain/usecases/watch_auth_state_use_case.dart';
 import 'package:neu_trade/features/auth/presentation/bloc/auth_event.dart';
 import 'package:neu_trade/features/auth/presentation/bloc/auth_state.dart';
+import 'package:neu_trade/features/profile/domain/usecases/get_profile_use_case.dart';
 import '../../../../core/error/failure.dart';
 import '../../../../core/usecase/usecase.dart';
 
@@ -20,6 +21,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final ForgotPasswordUseCase _forgotPassword;
   final LogoutUseCase _logout;
   final WatchAuthStateUseCase _watchAuthState;
+  final GetProfileUseCase _getProfile;
   late final StreamSubscription<Either<Failure, UserEntity?>>
   _authStateSubscription;
 
@@ -30,32 +32,34 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required ForgotPasswordUseCase forgotPassword,
     required LogoutUseCase logout,
     required WatchAuthStateUseCase watchAuthState,
+    required GetProfileUseCase getProfile,
   }) : _getCurrentUser = getCurrentUser,
        _login = login,
        _signUp = signUp,
        _forgotPassword = forgotPassword,
        _logout = logout,
        _watchAuthState = watchAuthState,
+       _getProfile = getProfile,
        super(const AuthUnknownState()) {
     _authStateSubscription = _watchAuthState(NoParams()).listen((result) {
       result.fold(
-        (failure) => add(AuthSessionChanged(user: null)),
+        (failure) => add(const AuthSessionChanged(user: null)),
         (user) => add(AuthSessionChanged(user: user)),
       );
     });
 
     on<AuthSessionRestoreRequested>((event, emit) async {
       final result = await _getCurrentUser(NoParams());
-      result.fold((failure) => emit(const AuthInitialState()), (user) {
-        if (user != null) {
-          emit(AuthLoginState(user: user));
-        } else {
-          emit(const AuthInitialState());
-        }
-      });
+      final user = result.fold((_) => null, (u) => u);
+      if (user != null) {
+        final isCompleted = await _checkProfileCompleted(user.id);
+        emit(AuthLoginState(user: user, isProfileCompleted: isCompleted));
+      } else {
+        emit(const AuthInitialState());
+      }
     });
 
-    on<AuthSessionChanged>((event, emit) {
+    on<AuthSessionChanged>((event, emit) async {
       if (state is AuthLoadingState) return;
 
       if (event.user == null) {
@@ -70,7 +74,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (currentState is AuthLoginState && currentState.user.id == user.id) {
         return;
       }
-      emit(AuthLoginState(user: user));
+      final isCompleted = await _checkProfileCompleted(user.id);
+      emit(AuthLoginState(user: user, isProfileCompleted: isCompleted));
+    });
+
+    on<AuthProfileCompletedEvent>((event, emit) {
+      final currentState = state;
+      if (currentState is AuthLoginState && !currentState.isProfileCompleted) {
+        emit(
+          AuthLoginState(
+            user: currentState.user,
+            isProfileCompleted: true,
+          ),
+        );
+      }
     });
 
     // sign up
@@ -95,9 +112,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         final result = await _login(
           LoginParams(email: event.email, password: event.password),
         );
-        result.fold(
-          (failure) => emit(AuthErrorState(message: failure.message)),
-          (user) => emit(AuthLoginState(user: user)),
+        await result.fold(
+          (failure) async => emit(AuthErrorState(message: failure.message)),
+          (user) async {
+            final isCompleted = await _checkProfileCompleted(user.id);
+            emit(AuthLoginState(user: user, isProfileCompleted: isCompleted));
+          },
         );
       } catch (e) {
         emit(AuthErrorState(message: e.toString()));
@@ -133,6 +153,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthErrorState(message: e.toString()));
       }
     });
+  }
+
+  Future<bool> _checkProfileCompleted(String userId) async {
+    final profileResult = await _getProfile(GetProfileParams(userId: userId));
+    return profileResult.fold(
+      (_) => false,
+      (profile) => profile?.isCompleted ?? false,
+    );
   }
 
   @override

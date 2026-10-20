@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:neu_trade/core/constants/color_constants.dart';
 import 'package:neu_trade/core/services/profile_services.dart';
+import 'package:neu_trade/features/review/presentation/widgets/review_bottom_sheet.dart';
 
 import '../../domain/entities/status.dart';
 import '../../domain/entities/transaction_entity.dart';
 import '../bloc/transaction_bloc.dart';
 import '../bloc/transaction_event.dart';
 import '../bloc/transaction_state.dart';
+import '../widgets/cancel_transaction_sheet.dart';
 import '../widgets/summary.dart';
 import '../widgets/transaction_card.dart';
 
@@ -31,11 +34,57 @@ class _TransactionScreenState extends State<TransactionScreen> {
 
   final ProfileServices _profileServices = ProfileServices();
   final Map<String, Future<String>> _phoneCache = {};
+  final Map<String, Future<int?>> _cancelCountCache = {};
 
   Future<String> _getPhone(String userId) async {
     final result = await _profileServices.getProfile(userId: userId);
     final phone = result?['so_dien_thoai']?.toString().trim();
     return (phone != null && phone.isNotEmpty) ? phone : 'Chưa cập nhật';
+  }
+
+  Future<int?> _getCancelCount(String userId) async {
+    final stats = await _profileServices.getUserPublicStats(userId: userId);
+    return (stats?['so_lan_huy_don'] as num?)?.toInt();
+  }
+
+  Future<void> _promptCancel(TransactionEntity item) async {
+    final isBuying = item.buyerId == widget.currentUserId;
+    final reason = await CancelTransactionSheet.show(
+      context: context,
+      postTitle: item.postTitle,
+      isBuyer: isBuying,
+    );
+
+    if (reason != null && mounted) {
+      context.read<TransactionBloc>().add(
+        TransactionCancelRequested(
+          transactionId: item.transactionId,
+          reason: reason,
+        ),
+      );
+    }
+  }
+
+  Future<void> _promptReview(TransactionEntity item) async {
+    final isBuying = item.buyerId == widget.currentUserId;
+    final targetName = isBuying ? item.sellerName : item.buyerName;
+
+    final result = await ReviewBottomSheet.show(
+      context: context,
+      targetUserName: targetName,
+      postTitle: item.postTitle,
+      isEvaluatingSeller: isBuying,
+    );
+
+    if (result != null && mounted) {
+      context.read<TransactionBloc>().add(
+        TransactionReviewSubmitted(
+          transactionId: item.transactionId,
+          stars: result.stars,
+          content: result.content,
+        ),
+      );
+    }
   }
 
   @override
@@ -46,172 +95,381 @@ class _TransactionScreenState extends State<TransactionScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
-              backgroundColor: const Color(0xFF237853),
+              backgroundColor: ColorConstants.snackBarSuccessColor,
+            ),
+          );
+          // Optional prompt: seller can evaluate buyer immediately or choose "Để sau"
+          _promptReview(state.completedTransaction);
+        } else if (state is TransactionCancelSuccessState) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: ColorConstants.snackBarSuccessColor,
+            ),
+          );
+        } else if (state is TransactionReviewSuccessState) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: ColorConstants.snackBarSuccessColor,
             ),
           );
         } else if (state is TransactionFailureState) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text("state.message"),
-              backgroundColor: Colors.red,
+              content: Text(state.message),
+              backgroundColor: ColorConstants.snackBarFailedColor,
             ),
           );
         }
       },
       builder: (context, state) {
-        if (state is TransactionLoadingState) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        final allTransactions = _extractTransactions(state);
-
-        final items = allTransactions.where((t) {
-          final isBuying = t.buyerId == widget.currentUserId;
-          if (isBuying != _buying) return false;
-          if (_statusFilter == 'Tất cả') return true;
-          return t.status.label == _statusFilter;
-        }).toList();
-
-        final activeCount = allTransactions
-            .where((t) => t.status == Status.DangGiuCho)
-            .length;
-        final doneCount = allTransactions
-            .where((t) => t.status == Status.HoanTat)
-            .length;
-
-        return RefreshIndicator(
-          onRefresh: () async {
-            context.read<TransactionBloc>().add(
-              const TransactionRefreshRequested(),
-            );
-          },
-          child: ListView(
-            key: const PageStorageKey('transactions-scroll'),
-            padding: const EdgeInsets.all(20),
-            children: [
-              // Summary card
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE7EEF9),
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Summary(
-                        value: activeCount.toString().padLeft(2, '0'),
-                        label: 'Đang trao đổi',
-                      ),
-                    ),
-                    const SizedBox(height: 44, child: VerticalDivider()),
-                    Expanded(
-                      child: Summary(
-                        value: doneCount.toString().padLeft(2, '0'),
-                        label: 'Đã hoàn tất',
-                      ),
-                    ),
-                  ],
-                ),
+        return Scaffold(
+          backgroundColor: ColorConstants.backgroundColor,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            title: const Text(
+              'Giao dịch của tôi',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: ColorConstants.textPrimaryColor,
+                letterSpacing: -0.4,
               ),
-              const SizedBox(height: 24),
-
-              // Tab: Tôi mua / Tôi bán
-              SegmentedButton<bool>(
-                showSelectedIcon: false,
-                segments: const [
-                  ButtonSegment(
-                    value: true,
-                    label: Text('Tôi mua'),
-                    icon: Icon(Icons.shopping_bag_outlined),
-                  ),
-                  ButtonSegment(
-                    value: false,
-                    label: Text('Tôi bán'),
-                    icon: Icon(Icons.sell_outlined),
-                  ),
-                ],
-                selected: {_buying},
-                onSelectionChanged: (selection) =>
-                    setState(() => _buying = selection.first),
+            ),
+            automaticallyImplyLeading: false,
+            actions: [
+              IconButton(
+                tooltip: 'Làm mới',
+                onPressed: () {
+                  context.read<TransactionBloc>().add(
+                    const TransactionRefreshRequested(),
+                  );
+                },
+                icon: const Icon(Icons.refresh_rounded),
               ),
-              const SizedBox(height: 16),
-
-              // Status filter chips
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    for (final status in [
-                      'Tất cả',
-                      'Đang giữ chỗ',
-                      'Hoàn tất',
-                      'Đã hủy',
-                    ])
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: ChoiceChip(
-                          label: Text(status),
-                          selected: status == _statusFilter,
-                          onSelected: (_) =>
-                              setState(() => _statusFilter = status),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              if (items.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.only(top: 40),
-                  child: Center(
-                    child: Text(
-                      'Chưa có giao dịch nào.',
-                      style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
-                    ),
-                  ),
-                )
-              else
-                for (final item in items)
-                  FutureBuilder<String>(
-                    future: _phoneCache.putIfAbsent(
-                      item.buyerId == widget.currentUserId
-                          ? item.sellerId
-                          : item.buyerId,
-                      () => _getPhone(
-                        item.buyerId == widget.currentUserId
-                            ? item.sellerId
-                            : item.buyerId,
-                      ),
-                    ),
-                    builder: (context, snapshot) => TransactionCard(
-                      item: item,
-                      phone: snapshot.data ?? 'Đang tải số điện thoại...',
-                      isBuying: item.buyerId == widget.currentUserId,
-                      onComplete:
-                          item.status == Status.DangGiuCho &&
-                              item.sellerId == widget.currentUserId
-                          ? () {
-                              context.read<TransactionBloc>().add(
-                                TransactionCompleteRequested(
-                                  item.transactionId,
-                                ),
-                              );
-                            }
-                          : null,
-                    ),
-                  ),
             ],
           ),
+          body: _buildBody(state),
         );
       },
+    );
+  }
+
+  Widget _buildBody(TransactionState state) {
+    if (state is TransactionLoadingState) {
+      return const Center(
+        child: CircularProgressIndicator(color: ColorConstants.primaryColor),
+      );
+    }
+
+    final allTransactions = _extractTransactions(state);
+
+    final items = allTransactions.where((t) {
+      final isBuying = t.buyerId == widget.currentUserId;
+      if (isBuying != _buying) return false;
+      if (_statusFilter == 'Tất cả') return true;
+      return t.status.label == _statusFilter;
+    }).toList();
+
+    final activeCount = allTransactions
+        .where((t) => t.status == Status.DangGiuCho)
+        .length;
+    final doneCount = allTransactions
+        .where((t) => t.status == Status.HoanTat)
+        .length;
+
+    return RefreshIndicator(
+      color: ColorConstants.primaryColor,
+      onRefresh: () async {
+        context.read<TransactionBloc>().add(
+          const TransactionRefreshRequested(),
+        );
+      },
+      child: ListView(
+        key: const PageStorageKey('transactions-scroll'),
+        padding: const EdgeInsets.all(20),
+        children: [
+          // Summary card
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: ColorConstants.borderLightColor),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x060F172A),
+                  blurRadius: 12,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Summary(
+                    icon: Icons.hourglass_top_rounded,
+                    value: activeCount.toString().padLeft(2, '0'),
+                    label: 'Đang trao đổi',
+                    color: ColorConstants.primaryColor,
+                  ),
+                ),
+                Container(
+                  height: 48,
+                  width: 1,
+                  color: ColorConstants.borderLightColor,
+                ),
+                Expanded(
+                  child: Summary(
+                    icon: Icons.check_circle_rounded,
+                    value: doneCount.toString().padLeft(2, '0'),
+                    label: 'Đã hoàn tất',
+                    color: ColorConstants.greenShade600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Tab: Tôi mua / Tôi bán
+          Container(
+            decoration: BoxDecoration(
+              color: ColorConstants.greyShade100,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            padding: const EdgeInsets.all(4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _buildRoleTab(
+                    title: 'Tôi mua',
+                    icon: Icons.shopping_bag_outlined,
+                    isSelected: _buying,
+                    onTap: () => setState(() => _buying = true),
+                  ),
+                ),
+                Expanded(
+                  child: _buildRoleTab(
+                    title: 'Tôi bán',
+                    icon: Icons.sell_outlined,
+                    isSelected: !_buying,
+                    onTap: () => setState(() => _buying = false),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Status filter chips
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children: [
+                for (final status in [
+                  'Tất cả',
+                  'Đang giữ chỗ',
+                  'Hoàn tất',
+                  'Đã hủy',
+                ])
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: ChoiceChip(
+                      label: Text(status),
+                      selected: status == _statusFilter,
+                      selectedColor: ColorConstants.primaryLightBg,
+                      backgroundColor: Colors.white,
+                      labelStyle: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: status == _statusFilter
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                        color: status == _statusFilter
+                            ? ColorConstants.primaryColor
+                            : ColorConstants.textSecondaryColor,
+                      ),
+                      side: BorderSide(
+                        color: status == _statusFilter
+                            ? ColorConstants.primaryColor
+                            : ColorConstants.borderLightColor,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      onSelected: (_) => setState(() => _statusFilter = status),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          if (items.isEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 20),
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: const BoxDecoration(
+                      color: ColorConstants.primaryLightBg,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.receipt_long_outlined,
+                      size: 32,
+                      color: ColorConstants.primaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Chưa có giao dịch nào',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: ColorConstants.textPrimaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    _buying
+                        ? 'Các tài liệu bạn đặt trước sẽ hiển thị ở đây'
+                        : 'Các đơn yêu cầu mua tài liệu của bạn sẽ hiển thị ở đây',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: ColorConstants.textSecondaryColor,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            for (final item in items)
+              FutureBuilder<String>(
+                future: _phoneCache.putIfAbsent(
+                  item.buyerId == widget.currentUserId
+                      ? item.sellerId
+                      : item.buyerId,
+                  () => _getPhone(
+                    item.buyerId == widget.currentUserId
+                        ? item.sellerId
+                        : item.buyerId,
+                  ),
+                ),
+                builder: (context, phoneSnapshot) {
+                  final phone = phoneSnapshot.data ?? 'Đang tải số điện thoại...';
+                  final isBuyingItem = item.buyerId == widget.currentUserId;
+
+                  if (!isBuyingItem) {
+                    return FutureBuilder<int?>(
+                      future: _cancelCountCache.putIfAbsent(
+                        item.buyerId,
+                        () => _getCancelCount(item.buyerId),
+                      ),
+                      builder: (context, cancelSnapshot) => TransactionCard(
+                        item: item,
+                        phone: phone,
+                        isBuying: false,
+                        currentUserId: widget.currentUserId,
+                        buyerCancelCount: cancelSnapshot.data,
+                        onComplete: item.status == Status.DangGiuCho &&
+                                item.sellerId == widget.currentUserId
+                            ? () {
+                                context.read<TransactionBloc>().add(
+                                  TransactionCompleteRequested(
+                                    item.transactionId,
+                                  ),
+                                );
+                              }
+                            : null,
+                        onCancel: item.status == Status.DangGiuCho
+                            ? () => _promptCancel(item)
+                            : null,
+                        onReview:
+                            (item.status == Status.HoanTat && !item.hasReviewed)
+                                ? () => _promptReview(item)
+                                : null,
+                      ),
+                    );
+                  }
+
+                  return TransactionCard(
+                    item: item,
+                    phone: phone,
+                    isBuying: true,
+                    currentUserId: widget.currentUserId,
+                    onCancel: item.status == Status.DangGiuCho
+                        ? () => _promptCancel(item)
+                        : null,
+                    onReview:
+                        (item.status == Status.HoanTat && !item.hasReviewed)
+                            ? () => _promptReview(item)
+                            : null,
+                  );
+                },
+              ),
+
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRoleTab({
+    required String title,
+    required IconData icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 1),
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        curve: Curves.easeInOut,
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 17,
+              color: isSelected
+                  ? ColorConstants.primaryColor
+                  : ColorConstants.textSecondaryColor,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected
+                    ? ColorConstants.primaryColor
+                    : ColorConstants.textSecondaryColor,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   List<TransactionEntity> _extractTransactions(TransactionState state) {
     if (state is TransactionLoadedState) return state.transactions;
     if (state is TransactionCompleteSuccessState) return state.transactions;
+    if (state is TransactionReviewSuccessState) return state.transactions;
+    if (state is TransactionFailureState) return state.transactions;
     return [];
   }
 }

@@ -44,10 +44,16 @@ String? resolveAuthRedirect({
 
   // Preserve a protected deep link after authentication.
   if (authenticated && isLoggingIn) {
-    if (authState is AuthLoginState) {
+    if (authState is AuthLoginState && !authState.isProfileCompleted) {
       return AppRoutePaths.profileSetup;
     }
     return resolveAuthReturnLocation(uri.queryParameters['from']);
+  }
+
+  if (authState is AuthLoginState &&
+      authState.isProfileCompleted &&
+      path == AppRoutePaths.profileSetup) {
+    return AppRoutePaths.appHome;
   }
 
   // The user is already inside a protected route.

@@ -103,17 +103,18 @@ class _ReserveBottomSheetState extends State<ReserveBottomSheet> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: ColorConstants.greyShade100,
+              color: ColorConstants.greyShade50,
               borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: ColorConstants.borderLightColor),
             ),
             child: Row(
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(10),
                   child: Container(
-                    width: 50,
-                    height: 50,
-                    color: ColorConstants.greyShade200,
+                    width: 52,
+                    height: 52,
+                    color: ColorConstants.primaryLightBg,
                     child: widget.post.imageUrls.isNotEmpty
                         ? Image.network(
                             widget.post.imageUrls.first,
@@ -121,13 +122,13 @@ class _ReserveBottomSheetState extends State<ReserveBottomSheet> {
                             errorBuilder: (_, _, _) => const Icon(
                               Icons.menu_book_rounded,
                               size: 24,
-                              color: ColorConstants.greyShade400,
+                              color: ColorConstants.primaryColor,
                             ),
                           )
                         : const Icon(
                             Icons.menu_book_rounded,
                             size: 24,
-                            color: ColorConstants.greyShade400,
+                            color: ColorConstants.primaryColor,
                           ),
                   ),
                 ),
@@ -143,15 +144,15 @@ class _ReserveBottomSheetState extends State<ReserveBottomSheet> {
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: ColorConstants.greyShade900,
+                          color: ColorConstants.textPrimaryColor,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         HomeFormatters.formatCurrency(widget.post.document.price),
                         style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
                           color: ColorConstants.primaryColor,
                         ),
                       ),
@@ -167,14 +168,14 @@ class _ReserveBottomSheetState extends State<ReserveBottomSheet> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
-              color: ColorConstants.blue.withAlpha(15),
+              color: ColorConstants.primaryLightBg,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: ColorConstants.blue.withAlpha(40)),
+              border: Border.all(color: ColorConstants.blueShade100),
             ),
             child: Row(
               children: [
                 const Icon(
-                  Icons.place_outlined,
+                  Icons.place_rounded,
                   size: 18,
                   color: ColorConstants.primaryColor,
                 ),
@@ -184,7 +185,7 @@ class _ReserveBottomSheetState extends State<ReserveBottomSheet> {
                     'Địa điểm gặp nhận sách: ${widget.post.address.label}',
                     style: const TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                       color: ColorConstants.primaryColor,
                     ),
                   ),
@@ -200,7 +201,7 @@ class _ReserveBottomSheetState extends State<ReserveBottomSheet> {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: ColorConstants.greyShade800,
+              color: ColorConstants.textPrimaryColor,
             ),
           ),
           const SizedBox(height: 6),
@@ -218,15 +219,15 @@ class _ReserveBottomSheetState extends State<ReserveBottomSheet> {
               contentPadding: const EdgeInsets.all(12),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: ColorConstants.greyShade300),
+                borderSide: const BorderSide(color: ColorConstants.borderLightColor),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: ColorConstants.greyShade300),
+                borderSide: const BorderSide(color: ColorConstants.borderLightColor),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: ColorConstants.primaryColor),
+                borderSide: const BorderSide(color: ColorConstants.primaryColor, width: 1.5),
               ),
             ),
           ),
@@ -236,17 +237,28 @@ class _ReserveBottomSheetState extends State<ReserveBottomSheet> {
           const Text(
             'Lưu ý: Bạn và người bán sẽ gặp trực tiếp trong khuôn viên trường NEU để kiểm tra tài liệu và thanh toán.',
             style: TextStyle(
-              fontSize: 11,
-              color: ColorConstants.greyShade600,
-              height: 1.3,
+              fontSize: 11.5,
+              color: ColorConstants.textSecondaryColor,
+              height: 1.35,
             ),
           ),
           const SizedBox(height: 18),
 
           // Confirm button
-          SizedBox(
+          Container(
             width: double.infinity,
             height: 48,
+            decoration: BoxDecoration(
+              gradient: ColorConstants.primaryGradient,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: ColorConstants.primaryColor.withValues(alpha: 0.35),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
             child: ElevatedButton(
               onPressed: widget.isLoading
                   ? null
@@ -255,8 +267,9 @@ class _ReserveBottomSheetState extends State<ReserveBottomSheet> {
                       widget.onConfirm(_noteController.text.trim());
                     },
               style: ElevatedButton.styleFrom(
-                backgroundColor: ColorConstants.primaryColor,
-                foregroundColor: ColorConstants.white,
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -268,7 +281,7 @@ class _ReserveBottomSheetState extends State<ReserveBottomSheet> {
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         valueColor:
-                            AlwaysStoppedAnimation<Color>(ColorConstants.white),
+                            AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     )
                   : const Text(

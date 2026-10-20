@@ -23,3 +23,31 @@ class TransactionCompleteRequested extends TransactionEvent {
   @override
   List<Object?> get props => [transactionId];
 }
+
+class TransactionCancelRequested extends TransactionEvent {
+  const TransactionCancelRequested({
+    required this.transactionId,
+    this.reason,
+  });
+
+  final int transactionId;
+  final String? reason;
+
+  @override
+  List<Object?> get props => [transactionId, reason];
+}
+
+class TransactionReviewSubmitted extends TransactionEvent {
+  const TransactionReviewSubmitted({
+    required this.transactionId,
+    required this.stars,
+    this.content,
+  });
+
+  final int transactionId;
+  final int stars;
+  final String? content;
+
+  @override
+  List<Object?> get props => [transactionId, stars, content];
+}

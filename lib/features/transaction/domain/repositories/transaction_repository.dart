@@ -17,4 +17,9 @@ abstract interface class TransactionRepository {
   Future<Either<Failure, TransactionEntity>> completeTransaction({
     required int transactionId,
   });
+
+  Future<Either<Failure, TransactionEntity>> cancelTransaction({
+    required int transactionId,
+    String? reason,
+  });
 }

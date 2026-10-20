@@ -17,22 +17,36 @@ class HomeSearchBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: ColorConstants.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: ColorConstants.greyShade300,
+          color: ColorConstants.borderLightColor,
           width: 1,
         ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x060F172A),
+            blurRadius: 10,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
       child: Row(
         children: [
-          const Icon(
-            Icons.search_rounded,
-            color: ColorConstants.greyShade600,
-            size: 22,
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: ColorConstants.primaryLightBg,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(
+              Icons.search_rounded,
+              color: ColorConstants.primaryColor,
+              size: 18,
+            ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 12),
           Expanded(
             child: TextField(
               controller: controller,
@@ -40,16 +54,22 @@ class HomeSearchBar extends StatelessWidget {
               decoration: const InputDecoration(
                 hintText: 'Tìm giáo trình, đề thi, slide NEU...',
                 hintStyle: TextStyle(
-                  color: ColorConstants.greyShade500,
+                  color: ColorConstants.greyShade400,
                   fontSize: 14,
+                  fontWeight: FontWeight.w400,
                 ),
                 border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                fillColor: Colors.transparent,
+                filled: false,
                 isDense: true,
                 contentPadding: EdgeInsets.symmetric(vertical: 12),
               ),
               style: const TextStyle(
                 fontSize: 14,
-                color: ColorConstants.greyShade900,
+                fontWeight: FontWeight.w500,
+                color: ColorConstants.textPrimaryColor,
               ),
             ),
           ),
@@ -60,10 +80,17 @@ class HomeSearchBar extends StatelessWidget {
                 onChanged('');
                 onClear?.call();
               },
-              child: const Icon(
-                Icons.cancel,
-                color: ColorConstants.greyShade500,
-                size: 20,
+              child: Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  color: ColorConstants.greyShade100,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.close_rounded,
+                  color: ColorConstants.greyShade600,
+                  size: 16,
+                ),
               ),
             ),
         ],

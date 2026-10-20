@@ -9,6 +9,7 @@ class UserProfile extends Equatable {
     required this.phone,
     this.reputationScore,
     this.cancelledOrderCount,
+    required this.isCompleted,
   });
 
   final String userId;
@@ -16,7 +17,7 @@ class UserProfile extends Equatable {
   final String fullName;
   final String email;
   final String phone;
-  // Read-only values managed by the server, never by the profile form.
+  final bool isCompleted;
   final num? reputationScore;
   final int? cancelledOrderCount;
 
@@ -29,5 +30,6 @@ class UserProfile extends Equatable {
     phone,
     reputationScore,
     cancelledOrderCount,
+    isCompleted,
   ];
 }

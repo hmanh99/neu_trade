@@ -46,7 +46,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDatasource {
     } on CustomAuthException {
       rethrow;
     } catch (e) {
-      throw CustomAuthException(message: "Some thing went wrong");
+      throw CustomAuthException(message: "Đã xảy ra lỗi");
     }
   }
 
@@ -61,7 +61,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDatasource {
     } on CustomAuthException {
       rethrow;
     } catch (e) {
-      throw CustomAuthException(message: "Some thing went wrong");
+      throw CustomAuthException(message: "Đã xảy ra lỗi");
     }
   }
 
@@ -72,7 +72,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDatasource {
     } on CustomAuthException {
       rethrow;
     } catch (e) {
-      throw CustomAuthException(message: "Some thing went wrong");
+      throw CustomAuthException(message: "Đã xảy ra lỗi");
     }
   }
 
@@ -83,7 +83,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDatasource {
     } on CustomAuthException {
       rethrow;
     } catch (e) {
-      throw CustomAuthException(message: "Some thing went wrong");
+      throw CustomAuthException(message: "Đã xảy ra lỗi");
     }
   }
 

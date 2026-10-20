@@ -17,6 +17,11 @@ class TransactionEntity extends Equatable {
   final Status status;
   final String? note;
   final List<String> imageUrls;
+  final bool hasReviewed;
+  final int? myStars;
+  final String? cancelledById;
+  final String? cancelReason;
+  final DateTime? cancelledAt;
 
   const TransactionEntity({
     required this.transactionId,
@@ -33,7 +38,56 @@ class TransactionEntity extends Equatable {
     required this.status,
     this.note,
     this.imageUrls = const [],
+    this.hasReviewed = false,
+    this.myStars,
+    this.cancelledById,
+    this.cancelReason,
+    this.cancelledAt,
   });
+
+  TransactionEntity copyWith({
+    int? transactionId,
+    int? postId,
+    String? buyerId,
+    String? buyerName,
+    String? sellerId,
+    String? sellerName,
+    String? postTitle,
+    double? price,
+    Address? address,
+    DateTime? orderTime,
+    DateTime? expireTime,
+    Status? status,
+    String? note,
+    List<String>? imageUrls,
+    bool? hasReviewed,
+    int? myStars,
+    String? cancelledById,
+    String? cancelReason,
+    DateTime? cancelledAt,
+  }) {
+    return TransactionEntity(
+      transactionId: transactionId ?? this.transactionId,
+      postId: postId ?? this.postId,
+      buyerId: buyerId ?? this.buyerId,
+      buyerName: buyerName ?? this.buyerName,
+      sellerId: sellerId ?? this.sellerId,
+      sellerName: sellerName ?? this.sellerName,
+      postTitle: postTitle ?? this.postTitle,
+      price: price ?? this.price,
+      address: address ?? this.address,
+      orderTime: orderTime ?? this.orderTime,
+      expireTime: expireTime ?? this.expireTime,
+      status: status ?? this.status,
+      note: note ?? this.note,
+      imageUrls: imageUrls ?? this.imageUrls,
+      hasReviewed: hasReviewed ?? this.hasReviewed,
+      myStars: myStars ?? this.myStars,
+      cancelledById: cancelledById ?? this.cancelledById,
+      cancelReason: cancelReason ?? this.cancelReason,
+      cancelledAt: cancelledAt ?? this.cancelledAt,
+    );
+  }
 
   @override
   List<Object?> get props => [
@@ -51,5 +105,10 @@ class TransactionEntity extends Equatable {
     status,
     note,
     imageUrls,
+    hasReviewed,
+    myStars,
+    cancelledById,
+    cancelReason,
+    cancelledAt,
   ];
 }

@@ -22,16 +22,19 @@ class PostBottomBar extends StatelessWidget {
       padding: EdgeInsets.only(
         left: 20,
         right: 20,
-        top: 12,
+        top: 14,
         bottom: MediaQuery.of(context).padding.bottom + 12,
       ),
       decoration: BoxDecoration(
-        color: ColorConstants.white,
-        boxShadow: [
+        color: Colors.white,
+        border: const Border(
+          top: BorderSide(color: ColorConstants.borderLightColor),
+        ),
+        boxShadow: const [
           BoxShadow(
-            color: ColorConstants.black.withAlpha(15),
-            blurRadius: 10,
-            offset: const Offset(0, -4),
+            color: Color(0x0A0F172A),
+            blurRadius: 16,
+            offset: Offset(0, -4),
           ),
         ],
       ),
@@ -46,17 +49,18 @@ class PostBottomBar extends StatelessWidget {
                 'Giá bán',
                 style: TextStyle(
                   fontSize: 12,
-                  color: ColorConstants.greyShade600,
-                  fontWeight: FontWeight.w500,
+                  color: ColorConstants.textSecondaryColor,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 HomeFormatters.formatCurrency(price),
                 style: const TextStyle(
-                  fontSize: 20,
+                  fontSize: 21,
                   fontWeight: FontWeight.w800,
                   color: ColorConstants.primaryColor,
+                  letterSpacing: -0.5,
                 ),
               ),
             ],
@@ -96,30 +100,50 @@ class PostBottomBar extends StatelessWidget {
       return ElevatedButton(
         onPressed: null,
         style: ElevatedButton.styleFrom(
+          backgroundColor: ColorConstants.greyShade200,
+          foregroundColor: ColorConstants.greyShade600,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
         ),
-        child: const Text('Đã có người đặt'),
+        child: const Text(
+          'Đã có người đặt',
+          style: TextStyle(fontWeight: FontWeight.w700),
+        ),
       );
     }
 
-    return ElevatedButton.icon(
-      onPressed: onReserveTap,
-      icon: const Icon(Icons.shopping_bag_outlined, size: 20),
-      label: const Text(
-        'Đặt trước ngay',
-        style: TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w700,
-        ),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: ColorConstants.primaryGradient,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: ColorConstants.primaryColor.withValues(alpha: 0.35),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: ColorConstants.primaryColor,
-        foregroundColor: ColorConstants.white,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+      child: ElevatedButton.icon(
+        onPressed: onReserveTap,
+        icon: const Icon(Icons.shopping_bag_outlined, size: 19),
+        label: const Text(
+          'Đặt trước ngay',
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.1,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.white,
+          shadowColor: Colors.transparent,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
         ),
       ),
     );

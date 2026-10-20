@@ -44,9 +44,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
   Future<Either<Failure, List<TransactionEntity>>> getTransactions() async {
     try {
       final results = await remoteDatasource.getTransactions();
-      return Right(
-        results.map((model) => model.toEntity()).toList(),
-      );
+      return Right(results.map((model) => model.toEntity()).toList());
     } on Exception {
       return Left(Failure());
     }
@@ -59,6 +57,22 @@ class TransactionRepositoryImpl implements TransactionRepository {
     try {
       final result = await remoteDatasource.completeTransaction(
         transactionId: transactionId,
+      );
+      return Right(result.toEntity());
+    } on Exception catch (e) {
+      return Left(Failure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, TransactionEntity>> cancelTransaction({
+    required int transactionId,
+    String? reason,
+  }) async {
+    try {
+      final result = await remoteDatasource.cancelTransaction(
+        transactionId: transactionId,
+        reason: reason,
       );
       return Right(result.toEntity());
     } on Exception catch (e) {

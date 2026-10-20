@@ -16,38 +16,62 @@ class PostDetailSpecs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: ColorConstants.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ColorConstants.greyShade200),
+        border: Border.all(color: ColorConstants.borderLightColor),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x050F172A),
+            blurRadius: 10,
+            offset: Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Thông tin tài liệu',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: ColorConstants.greyShade900,
-            ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: ColorConstants.primaryLightBg,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.description_outlined,
+                  size: 18,
+                  color: ColorConstants.primaryColor,
+                ),
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                'Thông tin tài liệu',
+                style: TextStyle(
+                  fontSize: 15.5,
+                  fontWeight: FontWeight.w700,
+                  color: ColorConstants.textPrimaryColor,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           _buildSpecRow(
-            icon: Icons.category_outlined,
+            icon: Icons.category_rounded,
             title: 'Danh mục',
             value: document.category.label,
           ),
-          const Divider(height: 20, color: ColorConstants.greyShade200),
+          const Divider(height: 20, color: ColorConstants.dividerColor),
           _buildSpecRow(
-            icon: Icons.verified_outlined,
+            icon: Icons.verified_rounded,
             title: 'Tình trạng',
             value: document.condition.label,
           ),
           if (document.conditionNote != null &&
               document.conditionNote!.trim().isNotEmpty) ...[
-            const Divider(height: 20, color: ColorConstants.greyShade200),
+            const Divider(height: 20, color: ColorConstants.dividerColor),
             _buildSpecRow(
               icon: Icons.notes_rounded,
               title: 'Ghi chú tình trạng',
@@ -55,16 +79,16 @@ class PostDetailSpecs extends StatelessWidget {
             ),
           ],
           if (document.publicationYear != null) ...[
-            const Divider(height: 20, color: ColorConstants.greyShade200),
+            const Divider(height: 20, color: ColorConstants.dividerColor),
             _buildSpecRow(
-              icon: Icons.calendar_today_outlined,
+              icon: Icons.calendar_today_rounded,
               title: 'Năm xuất bản',
               value: '${document.publicationYear}',
             ),
           ],
-          const Divider(height: 20, color: ColorConstants.greyShade200),
+          const Divider(height: 20, color: ColorConstants.dividerColor),
           _buildSpecRow(
-            icon: Icons.place_outlined,
+            icon: Icons.place_rounded,
             title: 'Điểm nhận sách NEU',
             value: address.label,
           ),
@@ -84,14 +108,15 @@ class PostDetailSpecs extends StatelessWidget {
         Icon(
           icon,
           size: 18,
-          color: ColorConstants.greyShade600,
+          color: ColorConstants.primaryColor,
         ),
         const SizedBox(width: 10),
         Text(
           title,
           style: const TextStyle(
-            fontSize: 13,
-            color: ColorConstants.greyShade600,
+            fontSize: 13.5,
+            color: ColorConstants.textSecondaryColor,
+            fontWeight: FontWeight.w500,
           ),
         ),
         const SizedBox(width: 16),
@@ -100,9 +125,9 @@ class PostDetailSpecs extends StatelessWidget {
             value,
             textAlign: TextAlign.end,
             style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: ColorConstants.greyShade900,
+              fontSize: 13.5,
+              fontWeight: FontWeight.w700,
+              color: ColorConstants.textPrimaryColor,
             ),
           ),
         ),

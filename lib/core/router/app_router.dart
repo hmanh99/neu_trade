@@ -5,8 +5,12 @@ import 'package:neu_trade/core/router/route_names.dart';
 import 'package:neu_trade/core/router/route_paths.dart';
 import 'package:neu_trade/core/services/post_services.dart';
 import 'package:neu_trade/core/services/report_services.dart';
+import 'package:neu_trade/core/services/review_services.dart';
 import 'package:neu_trade/core/services/transaction_services.dart';
 import 'package:neu_trade/features/home/presentation/bloc/post_detail_bloc.dart';
+import 'package:neu_trade/features/review/data/datasources/review_remote_datasource.dart';
+import 'package:neu_trade/features/review/data/repositories/review_repository_impl.dart';
+import 'package:neu_trade/features/review/domain/usecases/submit_review_usecase.dart';
 import 'package:neu_trade/features/profile/domain/repositories/profile_repository.dart';
 import 'package:neu_trade/features/profile/domain/usecases/get_profile_use_case.dart';
 import 'package:neu_trade/features/profile/domain/usecases/save_profile_use_case.dart';
@@ -14,6 +18,7 @@ import 'package:neu_trade/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:neu_trade/features/profile/presentation/screens/profile_setup_screen.dart';
 import 'package:neu_trade/features/transaction/data/datasources/transaction_remote_datasource.dart';
 import 'package:neu_trade/features/transaction/data/repositories/transaction_repository_impl.dart';
+import 'package:neu_trade/features/transaction/domain/usecases/cancel_transaction_usecase.dart';
 import 'package:neu_trade/features/transaction/domain/usecases/complete_transaction_usecase.dart';
 import 'package:neu_trade/features/transaction/domain/usecases/create_transaction_usecase.dart';
 import 'package:neu_trade/features/transaction/domain/usecases/get_transactions_usecase.dart';
@@ -160,8 +165,8 @@ GoRouter createAppRouter(
                       // Transaction dependencies for reservation
                       final transactionDatasource =
                           TransactionRemoteDatasourceImpl(
-                        TransactionServices(userId: userId),
-                      );
+                            TransactionServices(userId: userId),
+                          );
                       final transactionRepository = TransactionRepositoryImpl(
                         remoteDatasource: transactionDatasource,
                       );
@@ -169,8 +174,9 @@ GoRouter createAppRouter(
                       return BlocProvider(
                         create: (_) => PostDetailBloc(
                           getHomePost: GetHomePostUsecase(postRepository),
-                          createTransaction:
-                              CreateTransactionUsecase(transactionRepository),
+                          createTransaction: CreateTransactionUsecase(
+                            transactionRepository,
+                          ),
                           sendReport: SendHomeReportUsecase(reportRepository),
                         ),
                         child: PostDetailScreen(
@@ -218,8 +224,7 @@ GoRouter createAppRouter(
               GoRoute(
                 path: AppRoutePaths.transaction,
                 name: AppRouteNames.transaction,
-                builder: (context, state) =>
-                    BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, state) => BlocBuilder<AuthBloc, AuthState>(
                   bloc: authBloc,
                   builder: (context, authState) {
                     final user = switch (authState) {
@@ -235,16 +240,30 @@ GoRouter createAppRouter(
                       remoteDatasource: datasource,
                     );
 
+                    final reviewDatasource = ReviewRemoteDatasourceImpl(
+                      ReviewServices(userId: user.id),
+                    );
+                    final reviewRepository = ReviewRepositoryImpl(
+                      remoteDatasource: reviewDatasource,
+                    );
+
                     return BlocProvider(
                       key: ValueKey(user.id),
                       create: (_) => TransactionBloc(
-                        getTransactions:
-                            GetTransactionsUsecase(repository: repository),
-                        completeTransaction:
-                            CompleteTransactionUsecase(repository),
+                        getTransactions: GetTransactionsUsecase(
+                          repository: repository,
+                        ),
+                        completeTransaction: CompleteTransactionUsecase(
+                          repository,
+                        ),
+                        cancelTransaction: CancelTransactionUsecase(
+                          repository,
+                        ),
+                        submitReview: SubmitReviewUsecase(reviewRepository),
                       ),
-                      child: TransactionScreen(currentUserId: user.id,),
+                      child: TransactionScreen(currentUserId: user.id),
                     );
+
                   },
                 ),
               ),
