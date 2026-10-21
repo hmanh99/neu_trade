@@ -10,7 +10,7 @@ import '../bloc/transaction_bloc.dart';
 import '../bloc/transaction_event.dart';
 import '../bloc/transaction_state.dart';
 import '../widgets/cancel_transaction_sheet.dart';
-import '../widgets/summary.dart';
+import '../widgets/role_tab.dart';
 import '../widgets/transaction_card.dart';
 
 class TransactionScreen extends StatefulWidget {
@@ -98,7 +98,6 @@ class _TransactionScreenState extends State<TransactionScreen> {
               backgroundColor: ColorConstants.snackBarSuccessColor,
             ),
           );
-          // Optional prompt: seller can evaluate buyer immediately or choose "Để sau"
           _promptReview(state.completedTransaction);
         } else if (state is TransactionCancelSuccessState) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -173,12 +172,6 @@ class _TransactionScreenState extends State<TransactionScreen> {
       return t.status.label == _statusFilter;
     }).toList();
 
-    final activeCount = allTransactions
-        .where((t) => t.status == Status.DangGiuCho)
-        .length;
-    final doneCount = allTransactions
-        .where((t) => t.status == Status.HoanTat)
-        .length;
 
     return RefreshIndicator(
       color: ColorConstants.primaryColor,
@@ -191,49 +184,6 @@ class _TransactionScreenState extends State<TransactionScreen> {
         key: const PageStorageKey('transactions-scroll'),
         padding: const EdgeInsets.all(20),
         children: [
-          // Summary card
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: ColorConstants.borderLightColor),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x060F172A),
-                  blurRadius: 12,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Summary(
-                    icon: Icons.hourglass_top_rounded,
-                    value: activeCount.toString().padLeft(2, '0'),
-                    label: 'Đang trao đổi',
-                    color: ColorConstants.primaryColor,
-                  ),
-                ),
-                Container(
-                  height: 48,
-                  width: 1,
-                  color: ColorConstants.borderLightColor,
-                ),
-                Expanded(
-                  child: Summary(
-                    icon: Icons.check_circle_rounded,
-                    value: doneCount.toString().padLeft(2, '0'),
-                    label: 'Đã hoàn tất',
-                    color: ColorConstants.greenShade600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-
           // Tab: Tôi mua / Tôi bán
           Container(
             decoration: BoxDecoration(
@@ -244,7 +194,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
             child: Row(
               children: [
                 Expanded(
-                  child: _buildRoleTab(
+                  child: RoleTab(
                     title: 'Tôi mua',
                     icon: Icons.shopping_bag_outlined,
                     isSelected: _buying,
@@ -252,7 +202,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
                   ),
                 ),
                 Expanded(
-                  child: _buildRoleTab(
+                  child: RoleTab(
                     title: 'Tôi bán',
                     icon: Icons.sell_outlined,
                     isSelected: !_buying,
@@ -422,48 +372,6 @@ class _TransactionScreenState extends State<TransactionScreen> {
     );
   }
 
-  Widget _buildRoleTab({
-    required String title,
-    required IconData icon,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 1),
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        curve: Curves.easeInOut,
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 17,
-              color: isSelected
-                  ? ColorConstants.primaryColor
-                  : ColorConstants.textSecondaryColor,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected
-                    ? ColorConstants.primaryColor
-                    : ColorConstants.textSecondaryColor,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   List<TransactionEntity> _extractTransactions(TransactionState state) {
     if (state is TransactionLoadedState) return state.transactions;

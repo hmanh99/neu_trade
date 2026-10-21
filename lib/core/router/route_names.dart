@@ -12,4 +12,5 @@ abstract final class AppRouteNames {
   static const transaction = 'transaction';
   static const profile = 'profile';
   static const profileSetup = 'profile-setup';
+  static const circulationStats = 'circulation-stats';
 }

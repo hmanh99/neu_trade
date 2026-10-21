@@ -140,7 +140,10 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                 ),
               )
             : SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
                 child: Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 440),
@@ -158,7 +161,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: ColorConstants.primaryColor.withValues(alpha: 0.35),
+                                    color: ColorConstants.primaryColor
+                                        .withValues(alpha: 0.35),
                                     blurRadius: 16,
                                     offset: const Offset(0, 6),
                                   ),
@@ -200,7 +204,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: ColorConstants.borderLightColor),
+                              border: Border.all(
+                                color: ColorConstants.borderLightColor,
+                              ),
                               boxShadow: const [
                                 BoxShadow(
                                   color: Color(0x060F172A),
@@ -225,7 +231,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                   controller: _studentId,
                                   enabled: !isSaving,
                                   validator: ProfileValidators.studentId,
-                                  textCapitalization: TextCapitalization.characters,
+                                  textCapitalization:
+                                      TextCapitalization.characters,
                                   decoration: const InputDecoration(
                                     hintText: 'VD: 11210000',
                                     prefixIcon: Icon(
@@ -324,7 +331,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                     borderRadius: BorderRadius.circular(14),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: ColorConstants.primaryColor.withValues(alpha: 0.35),
+                                        color: ColorConstants.primaryColor
+                                            .withValues(alpha: 0.35),
                                         blurRadius: 12,
                                         offset: const Offset(0, 4),
                                       ),

@@ -1,24 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neu_trade/core/config/app_config.dart';
+import 'package:neu_trade/core/di/dependency_injection.dart';
 import 'package:neu_trade/core/router/app_router.dart';
-import 'package:neu_trade/core/services/auth_services.dart';
-import 'package:neu_trade/core/services/profile_services.dart';
-import 'package:neu_trade/features/auth/data/datasources/auth_remote_datasource.dart';
-import 'package:neu_trade/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:neu_trade/features/auth/domain/usecases/forgot_password_use_case.dart';
-import 'package:neu_trade/features/auth/domain/usecases/get_current_user_use_case.dart';
-import 'package:neu_trade/features/auth/domain/usecases/login_use_case.dart';
-import 'package:neu_trade/features/auth/domain/usecases/logout_use_case.dart';
-import 'package:neu_trade/features/auth/domain/usecases/sign_up_use_case.dart';
-import 'package:neu_trade/features/auth/domain/usecases/watch_auth_state_use_case.dart';
-import 'package:neu_trade/features/auth/presentation/bloc/auth_bloc.dart';
-import 'features/auth/presentation/bloc/auth_event.dart';
-import 'package:neu_trade/features/profile/data/datasources/profile_remote_datasource.dart';
-import 'package:neu_trade/features/profile/data/repositories/profile_repository_impl.dart';
-import 'package:neu_trade/features/profile/domain/repositories/profile_repository.dart';
-import 'package:neu_trade/features/profile/domain/usecases/get_profile_use_case.dart';
 import 'package:neu_trade/core/theme/app_theme.dart';
+import 'package:neu_trade/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:neu_trade/features/auth/presentation/bloc/auth_event.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -29,40 +16,19 @@ Future<void> main() async {
     publishableKey: AppConfig.publishableKey,
   );
 
-  final profileRepository = ProfileRepositoryImpl(
-    remoteDatasource: ProfileRemoteDataSourceImpl(ProfileServices()),
-  );
+  await initDependencies();
 
-  final datasource = AuthRemoteDataSourceImpl(AuthServices());
-  final repository = AuthRepositoryImpl(remoteDatasource: datasource);
-  final authBloc = AuthBloc(
-    getCurrentUser: GetCurrentUserUseCase(repository),
-    login: LoginUseCase(repository),
-    signUp: SignUpUseCase(repository),
-    forgotPassword: ForgotPasswordUseCase(repository),
-    logout: LogoutUseCase(repository),
-    watchAuthState: WatchAuthStateUseCase(repository),
-    getProfile: GetProfileUseCase(profileRepository),
-  )..add(const AuthSessionRestoreRequested());
+  final authBloc = sl<AuthBloc>()..add(const AuthSessionRestoreRequested());
 
-  runApp(
-    MyApp(
-      authBloc: authBloc,
-      profileRepository: profileRepository,
-    ),
-  );
+  runApp(MyApp(authBloc: authBloc));
 }
 
 class MyApp extends StatelessWidget {
   MyApp({
     super.key,
     required AuthBloc authBloc,
-    required ProfileRepository profileRepository,
   }) : _authBloc = authBloc,
-       _router = createAppRouter(
-         authBloc,
-         profileRepository: profileRepository,
-       );
+       _router = createAppRouter(authBloc);
 
   final AuthBloc _authBloc;
   final RouterConfig<Object> _router;

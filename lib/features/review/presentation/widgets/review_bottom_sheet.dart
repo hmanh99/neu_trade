@@ -29,7 +29,7 @@ class ReviewBottomSheet extends StatefulWidget {
     return showModalBottomSheet<ReviewInput>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: ColorConstants.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -352,7 +352,7 @@ class _ReviewBottomSheetState extends State<ReviewBottomSheet> {
                       icon: const Icon(Icons.send_rounded, size: 18),
                       style: FilledButton.styleFrom(
                         backgroundColor: ColorConstants.primaryColor,
-                        foregroundColor: Colors.white,
+                        foregroundColor: ColorConstants.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),

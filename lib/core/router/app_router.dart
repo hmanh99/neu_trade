@@ -1,31 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:neu_trade/core/di/dependency_injection.dart';
 import 'package:neu_trade/core/router/route_names.dart';
 import 'package:neu_trade/core/router/route_paths.dart';
-import 'package:neu_trade/core/services/post_services.dart';
-import 'package:neu_trade/core/services/report_services.dart';
-import 'package:neu_trade/core/services/review_services.dart';
-import 'package:neu_trade/core/services/transaction_services.dart';
 import 'package:neu_trade/features/home/presentation/bloc/post_detail_bloc.dart';
-import 'package:neu_trade/features/review/data/datasources/review_remote_datasource.dart';
-import 'package:neu_trade/features/review/data/repositories/review_repository_impl.dart';
-import 'package:neu_trade/features/review/domain/usecases/submit_review_usecase.dart';
-import 'package:neu_trade/features/profile/domain/repositories/profile_repository.dart';
-import 'package:neu_trade/features/profile/domain/usecases/get_profile_use_case.dart';
-import 'package:neu_trade/features/profile/domain/usecases/save_profile_use_case.dart';
 import 'package:neu_trade/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:neu_trade/features/profile/presentation/screens/profile_setup_screen.dart';
-import 'package:neu_trade/features/transaction/data/datasources/transaction_remote_datasource.dart';
-import 'package:neu_trade/features/transaction/data/repositories/transaction_repository_impl.dart';
-import 'package:neu_trade/features/transaction/domain/usecases/cancel_transaction_usecase.dart';
-import 'package:neu_trade/features/transaction/domain/usecases/complete_transaction_usecase.dart';
-import 'package:neu_trade/features/transaction/domain/usecases/create_transaction_usecase.dart';
-import 'package:neu_trade/features/transaction/domain/usecases/get_transactions_usecase.dart';
+import 'package:neu_trade/features/statistics/presentation/bloc/statistics_bloc.dart';
+import 'package:neu_trade/features/statistics/presentation/screens/circulation_stats_screen.dart';
 import 'package:neu_trade/features/transaction/presentation/bloc/transaction_bloc.dart';
-import 'package:neu_trade/features/upload/data/datasources/post_remote_datasources.dart';
-import 'package:neu_trade/features/upload/data/repositories/upload_post_repository_impl.dart';
-import 'package:neu_trade/features/upload/domain/usecases/create_post_use_case.dart';
 import 'package:neu_trade/features/upload/presentation/bloc/upload_post_bloc.dart';
 import 'package:neu_trade/features/upload/presentation/screens/upload_post_screen.dart';
 import 'package:neu_trade/shared/wigdets/main_shell.dart';
@@ -35,13 +19,6 @@ import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/signup_screen.dart';
-import '../../features/home/data/datasources/home_post_remote_datasource.dart';
-import '../../features/home/data/datasources/home_post_report_datasource.dart';
-import '../../features/home/data/repositories/home_post_repository_impl.dart';
-import '../../features/home/data/repositories/home_post_report_repository_impl.dart';
-import '../../features/home/domain/usecases/get_home_post_usecase.dart';
-import '../../features/home/domain/usecases/get_home_posts_usecase.dart';
-import '../../features/home/domain/usecases/send_home_report_usecase.dart';
 import '../../features/home/presentation/bloc/home_post_bloc.dart';
 import '../../features/home/presentation/screens/home_post_screen.dart';
 import '../../features/home/presentation/screens/post_detail_screen.dart';
@@ -50,10 +27,7 @@ import '../../features/transaction/presentation/screens/transaction_screen.dart'
 import 'auth_redirect.dart';
 import 'go_router_refresh_stream.dart';
 
-GoRouter createAppRouter(
-  AuthBloc authBloc, {
-  required ProfileRepository profileRepository,
-}) {
+GoRouter createAppRouter(AuthBloc authBloc) {
   return GoRouter(
     initialLocation: AppRoutePaths.login,
     refreshListenable: GoRouterRefreshStream(authBloc.stream),
@@ -120,17 +94,9 @@ GoRouter createAppRouter(
                       _ => null,
                     };
                     if (user == null) return const SizedBox.shrink();
-                    final datasource = HomePostRemoteDatasourceImpl(
-                      PostServices(userId: user.id),
-                    );
-                    final repository = HomePostRepositoryImpl(
-                      homePostRemoteDatasource: datasource,
-                    );
                     return BlocProvider(
                       key: ValueKey(user.id),
-                      create: (_) => HomeBloc(
-                        getHomePosts: GetHomePostsUsecase(repository),
-                      ),
+                      create: (_) => sl<HomeBloc>(),
                       child: const HomeScreen(),
                     );
                   },
@@ -149,36 +115,8 @@ GoRouter createAppRouter(
                       };
                       final userId = user?.id ?? '';
 
-                      // Home post dependencies
-                      final postDatasource = HomePostRemoteDatasourceImpl(
-                        PostServices(userId: userId),
-                      );
-                      final postRepository = HomePostRepositoryImpl(
-                        homePostRemoteDatasource: postDatasource,
-                      );
-                      final reportRepository = HomePostReportRepositoryImpl(
-                        homePostReportDatasource: HomePostReportDatasourceImpl(
-                          ReportServices(userId: userId),
-                        ),
-                      );
-
-                      // Transaction dependencies for reservation
-                      final transactionDatasource =
-                          TransactionRemoteDatasourceImpl(
-                            TransactionServices(userId: userId),
-                          );
-                      final transactionRepository = TransactionRepositoryImpl(
-                        remoteDatasource: transactionDatasource,
-                      );
-
                       return BlocProvider(
-                        create: (_) => PostDetailBloc(
-                          getHomePost: GetHomePostUsecase(postRepository),
-                          createTransaction: CreateTransactionUsecase(
-                            transactionRepository,
-                          ),
-                          sendReport: SendHomeReportUsecase(reportRepository),
-                        ),
+                        create: (_) => sl<PostDetailBloc>(),
                         child: PostDetailScreen(
                           postId: postId,
                           currentUserId: userId,
@@ -203,15 +141,9 @@ GoRouter createAppRouter(
                       _ => null,
                     };
                     if (user == null) return const SizedBox.shrink();
-                    final repository = PostRepositoryImpl(
-                      remoteDatasource: PostRemoteDataSourceImpl(
-                        PostServices(userId: user.id),
-                      ),
-                    );
                     return BlocProvider(
                       key: ValueKey(user.id),
-                      create: (_) =>
-                          PostBloc(createPost: CreatePostUseCase(repository)),
+                      create: (_) => sl<PostBloc>(),
                       child: const PostScreen(),
                     );
                   },
@@ -233,37 +165,11 @@ GoRouter createAppRouter(
                     };
                     if (user == null) return const SizedBox.shrink();
 
-                    final datasource = TransactionRemoteDatasourceImpl(
-                      TransactionServices(userId: user.id),
-                    );
-                    final repository = TransactionRepositoryImpl(
-                      remoteDatasource: datasource,
-                    );
-
-                    final reviewDatasource = ReviewRemoteDatasourceImpl(
-                      ReviewServices(userId: user.id),
-                    );
-                    final reviewRepository = ReviewRepositoryImpl(
-                      remoteDatasource: reviewDatasource,
-                    );
-
                     return BlocProvider(
                       key: ValueKey(user.id),
-                      create: (_) => TransactionBloc(
-                        getTransactions: GetTransactionsUsecase(
-                          repository: repository,
-                        ),
-                        completeTransaction: CompleteTransactionUsecase(
-                          repository,
-                        ),
-                        cancelTransaction: CancelTransactionUsecase(
-                          repository,
-                        ),
-                        submitReview: SubmitReviewUsecase(reviewRepository),
-                      ),
+                      create: (_) => sl<TransactionBloc>(),
                       child: TransactionScreen(currentUserId: user.id),
                     );
-
                   },
                 ),
               ),
@@ -285,15 +191,33 @@ GoRouter createAppRouter(
                     if (user == null) return const SizedBox.shrink();
                     return BlocProvider(
                       key: ValueKey(user.id),
-                      create: (_) => ProfileBloc(
-                        userId: user.id,
-                        getProfile: GetProfileUseCase(profileRepository),
-                        saveProfile: SaveProfileUseCase(profileRepository),
-                      ),
+                      create: (_) => sl<ProfileBloc>(param1: user.id),
                       child: const ProfileScreen(),
                     );
                   },
                 ),
+                routes: [
+                  GoRoute(
+                    path: 'statistics',
+                    name: AppRouteNames.circulationStats,
+                    builder: (context, state) =>
+                        BlocBuilder<AuthBloc, AuthState>(
+                          bloc: authBloc,
+                          builder: (context, authState) {
+                            final user = switch (authState) {
+                              AuthLoginState(:final user) => user,
+                              _ => null,
+                            };
+                            if (user == null) return const SizedBox.shrink();
+                            return BlocProvider(
+                              key: ValueKey(user.id),
+                              create: (_) => sl<StatisticsBloc>(),
+                              child: const CirculationStatsScreen(),
+                            );
+                          },
+                        ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -312,11 +236,7 @@ GoRouter createAppRouter(
 
           return BlocProvider(
             key: ValueKey(user.id),
-            create: (context) => ProfileBloc(
-              userId: user.id,
-              getProfile: GetProfileUseCase(profileRepository),
-              saveProfile: SaveProfileUseCase(profileRepository),
-            ),
+            create: (context) => sl<ProfileBloc>(param1: user.id),
             child: ProfileSetupScreen(
               userId: user.id,
               initialEmail: user.email,

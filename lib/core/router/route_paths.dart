@@ -18,6 +18,7 @@ abstract final class AppRoutePaths {
   static const transaction = '/app/transaction';
   static const profile = '/app/profile';
   static const profileSetup = '/app/profile/setup';
+  static const circulationStats = '/app/profile/statistics';
 
   static bool isAuthPath(String location) {
     final path = Uri.parse(location).path;
