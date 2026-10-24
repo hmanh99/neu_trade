@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:neu_trade/core/constants/color_constants.dart';
-import 'home_formatters.dart';
+import '../../../../shared/home_formatters.dart';
 
 class PostBottomBar extends StatelessWidget {
   const PostBottomBar({

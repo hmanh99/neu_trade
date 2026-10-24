@@ -3,7 +3,7 @@ import 'package:neu_trade/features/auth/presentation/bloc/auth_state.dart';
 
 /// Guard / redirect base on [AuthState] and current [URL].
 
-String resolveAuthReturnLocation(String? rawLocation) {
+String resolveAuthReturnLocation(String? rawLocation, {bool isAdmin = false}) {
   if (rawLocation == null || rawLocation.isEmpty) {
     return AppRoutePaths.appHome;
   }
@@ -13,6 +13,10 @@ String resolveAuthReturnLocation(String? rawLocation) {
       uri.hasScheme ||
       uri.hasAuthority ||
       !AppRoutePaths.isAppShellPath(uri.path)) {
+    return AppRoutePaths.appHome;
+  }
+
+  if (AppRoutePaths.isAdminPath(uri.path) && !isAdmin) {
     return AppRoutePaths.appHome;
   }
 
@@ -47,13 +51,25 @@ String? resolveAuthRedirect({
     if (authState is AuthLoginState && !authState.isProfileCompleted) {
       return AppRoutePaths.profileSetup;
     }
-    return resolveAuthReturnLocation(uri.queryParameters['from']);
+    final isAdmin = authState is AuthLoginState && authState.isAdmin;
+    return resolveAuthReturnLocation(
+      uri.queryParameters['from'],
+      isAdmin: isAdmin,
+    );
   }
 
   if (authState is AuthLoginState &&
       authState.isProfileCompleted &&
       path == AppRoutePaths.profileSetup) {
     return AppRoutePaths.appHome;
+  }
+
+  // Admin route protection:
+  if (AppRoutePaths.isAdminPath(path)) {
+    final isAdmin = authState is AuthLoginState && authState.isAdmin;
+    if (!isAdmin) {
+      return AppRoutePaths.appHome;
+    }
   }
 
   // The user is already inside a protected route.

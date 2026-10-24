@@ -10,7 +10,7 @@ class ProfileServices {
     return await _activeClient
         .from('sinh_vien')
         .select(
-          'sinhvien_id,msv,ho_ten,email_neu,so_dien_thoai,diem_uy_tin,so_lan_huy_don,is_completed',
+          'sinhvien_id,msv,ho_ten,email_neu,so_dien_thoai,diem_uy_tin,so_lan_huy_don,is_completed,is_admin',
         )
         .eq('sinhvien_id', userId)
         .maybeSingle();

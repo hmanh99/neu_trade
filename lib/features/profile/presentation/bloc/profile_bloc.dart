@@ -25,6 +25,9 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
     on<ProfileSaveEvent>((event, emit) async {
       if (_isBusy || state is ProfileSaveSuccessState) return;
+      final currentAdmin = state is ProfileLoadedState
+          ? (state as ProfileLoadedState).profile?.isAdmin ?? false
+          : false;
       emit(const ProfileSavingState());
       final profile = UserProfile(
         userId: userId,
@@ -33,6 +36,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         email: event.email,
         phone: event.phone,
         isCompleted: event.isCompleted,
+        isAdmin: currentAdmin,
       );
       final result = await _saveProfile(SaveProfileParams(profile: profile));
       result.fold(

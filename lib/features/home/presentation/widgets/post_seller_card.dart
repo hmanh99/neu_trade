@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:neu_trade/core/constants/color_constants.dart';
 import 'package:neu_trade/core/services/profile_services.dart';
 import '../../domain/entities/address.dart';
-import 'home_formatters.dart';
+import '../../../../shared/home_formatters.dart';
 
 class PostSellerCard extends StatelessWidget {
   const PostSellerCard({

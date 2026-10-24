@@ -52,8 +52,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final result = await _getCurrentUser(NoParams());
       final user = result.fold((_) => null, (u) => u);
       if (user != null) {
-        final isCompleted = await _checkProfileCompleted(user.id);
-        emit(AuthLoginState(user: user, isProfileCompleted: isCompleted));
+        final flags = await _loadProfileFlags(user.id);
+        emit(
+          AuthLoginState(
+            user: user,
+            isProfileCompleted: flags.isCompleted,
+            isAdmin: flags.isAdmin,
+          ),
+        );
       } else {
         emit(const AuthInitialState());
       }
@@ -74,8 +80,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (currentState is AuthLoginState && currentState.user.id == user.id) {
         return;
       }
-      final isCompleted = await _checkProfileCompleted(user.id);
-      emit(AuthLoginState(user: user, isProfileCompleted: isCompleted));
+      final flags = await _loadProfileFlags(user.id);
+      emit(
+        AuthLoginState(
+          user: user,
+          isProfileCompleted: flags.isCompleted,
+          isAdmin: flags.isAdmin,
+        ),
+      );
     });
 
     on<AuthProfileCompletedEvent>((event, emit) {
@@ -85,6 +97,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           AuthLoginState(
             user: currentState.user,
             isProfileCompleted: true,
+            isAdmin: currentState.isAdmin,
           ),
         );
       }
@@ -115,8 +128,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         await result.fold(
           (failure) async => emit(AuthErrorState(message: failure.message)),
           (user) async {
-            final isCompleted = await _checkProfileCompleted(user.id);
-            emit(AuthLoginState(user: user, isProfileCompleted: isCompleted));
+            final flags = await _loadProfileFlags(user.id);
+            emit(
+              AuthLoginState(
+                user: user,
+                isProfileCompleted: flags.isCompleted,
+                isAdmin: flags.isAdmin,
+              ),
+            );
           },
         );
       } catch (e) {
@@ -155,11 +174,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
   }
 
-  Future<bool> _checkProfileCompleted(String userId) async {
+  Future<({bool isCompleted, bool isAdmin})> _loadProfileFlags(
+    String userId,
+  ) async {
     final profileResult = await _getProfile(GetProfileParams(userId: userId));
     return profileResult.fold(
-      (_) => false,
-      (profile) => profile?.isCompleted ?? false,
+      (_) => (isCompleted: false, isAdmin: false),
+      (profile) => (
+        isCompleted: profile?.isCompleted ?? false,
+        isAdmin: profile?.isAdmin ?? false,
+      ),
     );
   }
 

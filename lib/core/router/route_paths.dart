@@ -19,6 +19,8 @@ abstract final class AppRoutePaths {
   static const profile = '/app/profile';
   static const profileSetup = '/app/profile/setup';
   static const circulationStats = '/app/profile/statistics';
+  static const adminPosts = '/app/profile/admin/posts';
+  static const adminReports = '/app/profile/admin/reports';
 
   static bool isAuthPath(String location) {
     final path = Uri.parse(location).path;
@@ -28,6 +30,11 @@ abstract final class AppRoutePaths {
   static bool isAppShellPath(String location) {
     final path = Uri.parse(location).path;
     return _isPathWithin(path, app);
+  }
+
+  static bool isAdminPath(String location) {
+    final path = Uri.parse(location).path;
+    return path == circulationStats || _isPathWithin(path, '/app/profile/admin');
   }
 
   static bool _isPathWithin(String path, String root) =>

@@ -13,4 +13,6 @@ abstract final class AppRouteNames {
   static const profile = 'profile';
   static const profileSetup = 'profile-setup';
   static const circulationStats = 'circulation-stats';
+  static const adminPosts = 'admin-posts';
+  static const adminReports = 'admin-reports';
 }

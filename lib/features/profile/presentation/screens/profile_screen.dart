@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:neu_trade/core/constants/color_constants.dart';
-import 'package:neu_trade/core/router/route_names.dart';
+import 'package:neu_trade/features/admin/presentation/widgets/admin_menu_section.dart';
 import 'package:neu_trade/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:neu_trade/features/auth/presentation/bloc/auth_event.dart';
 import 'package:neu_trade/features/auth/presentation/bloc/auth_state.dart';
@@ -202,75 +201,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 16),
-            InkWell(
-              onTap: () => context.pushNamed(AppRouteNames.circulationStats),
-              borderRadius: BorderRadius.circular(18),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: ColorConstants.borderLightColor),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x060F172A),
-                      blurRadius: 12,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: ColorConstants.blueShade50,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.insights_outlined,
-                        color: ColorConstants.primaryColor,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Thống kê luân chuyển',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                              color: ColorConstants.textPrimaryColor,
-                            ),
-                          ),
-                          SizedBox(height: 2),
-                          Text(
-                            'Số liệu sách bàn giao và trao tặng theo học kỳ',
-                            style: TextStyle(
-                              fontSize: 12.5,
-                              color: ColorConstants.textSecondaryColor,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(
-                      Icons.chevron_right_rounded,
-                      color: ColorConstants.greyShade400,
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            if (profile.isAdmin) ...[
+              const SizedBox(height: 24),
+              const AdminMenuSection(),
+            ],
             const SizedBox(height: 24),
             InkWell(
               onTap: _confirmSignOut,

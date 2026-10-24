@@ -10,6 +10,7 @@ class ProfileModel extends UserProfile {
     super.reputationScore,
     super.cancelledOrderCount,
     required super.isCompleted,
+    super.isAdmin = false,
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
@@ -22,6 +23,7 @@ class ProfileModel extends UserProfile {
       reputationScore: _readScore(json['diem_uy_tin']),
       cancelledOrderCount: (json['so_lan_huy_don'] as num?)?.toInt(),
       isCompleted: (json['is_completed'] as bool?) ?? false,
+      isAdmin: (json['is_admin'] as bool?) ?? false,
     );
   }
 
@@ -35,6 +37,7 @@ class ProfileModel extends UserProfile {
       reputationScore: profile.reputationScore,
       cancelledOrderCount: profile.cancelledOrderCount,
       isCompleted: profile.isCompleted,
+      isAdmin: profile.isAdmin,
     );
   }
 
@@ -46,7 +49,9 @@ class ProfileModel extends UserProfile {
       email: email,
       phone: phone,
       reputationScore: reputationScore,
-      cancelledOrderCount: cancelledOrderCount, isCompleted: isCompleted,
+      cancelledOrderCount: cancelledOrderCount,
+      isCompleted: isCompleted,
+      isAdmin: isAdmin,
     );
   }
 
@@ -57,12 +62,13 @@ class ProfileModel extends UserProfile {
   }
 
   // Only user-editable fields belong in the upsert payload.
+  // Note: is_admin is controlled by server and must not be sent in client updates.
   Map<String, dynamic> toJson() => {
     'sinhvien_id': userId,
     'msv': studentId,
     'ho_ten': fullName,
     'email_neu': email,
     'so_dien_thoai': phone,
-    'is_completed' : isCompleted
+    'is_completed': isCompleted,
   };
 }

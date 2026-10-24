@@ -10,6 +10,7 @@ class UserProfile extends Equatable {
     this.reputationScore,
     this.cancelledOrderCount,
     required this.isCompleted,
+    this.isAdmin = false,
   });
 
   final String userId;
@@ -20,6 +21,7 @@ class UserProfile extends Equatable {
   final bool isCompleted;
   final num? reputationScore;
   final int? cancelledOrderCount;
+  final bool isAdmin;
 
   @override
   List<Object?> get props => [
@@ -31,5 +33,6 @@ class UserProfile extends Equatable {
     reputationScore,
     cancelledOrderCount,
     isCompleted,
+    isAdmin,
   ];
 }

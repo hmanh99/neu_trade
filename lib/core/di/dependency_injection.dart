@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:neu_trade/core/services/admin_services.dart';
 import 'package:neu_trade/core/services/auth_services.dart';
 import 'package:neu_trade/core/services/post_services.dart';
 import 'package:neu_trade/core/services/profile_services.dart';
@@ -6,6 +7,16 @@ import 'package:neu_trade/core/services/report_services.dart';
 import 'package:neu_trade/core/services/review_services.dart';
 import 'package:neu_trade/core/services/statistics_services.dart';
 import 'package:neu_trade/core/services/transaction_services.dart';
+import 'package:neu_trade/features/admin/data/datasources/admin_remote_datasource.dart';
+import 'package:neu_trade/features/admin/data/repositories/admin_repository_impl.dart';
+import 'package:neu_trade/features/admin/domain/repositories/admin_repository.dart';
+import 'package:neu_trade/features/admin/domain/usecases/approve_post_usecase.dart';
+import 'package:neu_trade/features/admin/domain/usecases/get_pending_posts_usecase.dart';
+import 'package:neu_trade/features/admin/domain/usecases/get_reports_usecase.dart';
+import 'package:neu_trade/features/admin/domain/usecases/reject_post_usecase.dart';
+import 'package:neu_trade/features/admin/domain/usecases/resolve_report_usecase.dart';
+import 'package:neu_trade/features/admin/presentation/bloc/post_approval_bloc.dart';
+import 'package:neu_trade/features/admin/presentation/bloc/report_management_bloc.dart';
 import 'package:neu_trade/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:neu_trade/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:neu_trade/features/auth/domain/repositories/auth_repository.dart';
@@ -101,6 +112,9 @@ Future<void> initDependencies() async {
   sl.registerFactoryParam<TransactionServices, String?, void>(
     (userId, _) =>
         TransactionServices(userId: _resolveUserId(userId), client: sl()),
+  );
+  sl.registerFactoryParam<AdminServices, String?, void>(
+    (userId, _) => AdminServices(userId: _resolveUserId(userId), client: sl()),
   );
 
   // Feature: Auth
@@ -291,5 +305,48 @@ Future<void> initDependencies() async {
   // Bloc
   sl.registerFactory<StatisticsBloc>(
     () => StatisticsBloc(getCirculationStats: sl()),
+  );
+
+  // Feature: Admin
+  // Datasources
+  sl.registerFactory<AdminRemoteDatasource>(
+    () => AdminRemoteDataSourceImpl(sl()),
+  );
+
+  // Repositories
+  sl.registerFactory<AdminRepository>(
+    () => AdminRepositoryImpl(remoteDatasource: sl()),
+  );
+
+  // UseCases
+  sl.registerFactory<GetPendingPostsUsecase>(
+    () => GetPendingPostsUsecase(sl()),
+  );
+  sl.registerFactory<ApprovePostUsecase>(
+    () => ApprovePostUsecase(sl()),
+  );
+  sl.registerFactory<RejectPostUsecase>(
+    () => RejectPostUsecase(sl()),
+  );
+  sl.registerFactory<GetReportsUsecase>(
+    () => GetReportsUsecase(sl()),
+  );
+  sl.registerFactory<ResolveReportUsecase>(
+    () => ResolveReportUsecase(sl()),
+  );
+
+  // Blocs
+  sl.registerFactory<PostApprovalBloc>(
+    () => PostApprovalBloc(
+      getPendingPosts: sl(),
+      approvePost: sl(),
+      rejectPost: sl(),
+    ),
+  );
+  sl.registerFactory<ReportManagementBloc>(
+    () => ReportManagementBloc(
+      getReports: sl(),
+      resolveReport: sl(),
+    ),
   );
 }

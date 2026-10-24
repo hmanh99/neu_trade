@@ -33,18 +33,18 @@ class AuthLoadingState extends AuthState {
 //     Sign-in / Sign-up success
 
 class AuthLoginState extends AuthAuthenticatedState {
-  // FIX: changed UserModel → UserEntity (domain states must depend on
-  //      domain types only, never on data-layer models).
   final UserEntity user;
   final bool isProfileCompleted;
+  final bool isAdmin;
 
   const AuthLoginState({
     required this.user,
     this.isProfileCompleted = false,
+    this.isAdmin = false,
   });
 
   @override
-  List<Object?> get props => [user, isProfileCompleted];
+  List<Object?> get props => [user, isProfileCompleted, isAdmin];
 }
 
 /// Account creation succeeded. This is deliberately not an authenticated
@@ -59,9 +59,6 @@ class AuthSignUpState extends AuthState {
 }
 
 //     Forgot password
-
-// FIX: Removed unused AuthForgotPasswordState — it was dead code that could
-//      be confused with AuthForgotPasswordSuccessState by future developers.
 
 class AuthForgotPasswordSuccessState extends AuthState {
   const AuthForgotPasswordSuccessState();

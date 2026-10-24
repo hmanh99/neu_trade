@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:neu_trade/core/di/dependency_injection.dart';
 import 'package:neu_trade/core/router/route_names.dart';
 import 'package:neu_trade/core/router/route_paths.dart';
+import 'package:neu_trade/features/admin/presentation/bloc/post_approval_bloc.dart';
+import 'package:neu_trade/features/admin/presentation/bloc/report_management_bloc.dart';
+import 'package:neu_trade/features/admin/presentation/screens/post_approval_screen.dart';
+import 'package:neu_trade/features/admin/presentation/screens/report_management_screen.dart';
 import 'package:neu_trade/features/home/presentation/bloc/post_detail_bloc.dart';
 import 'package:neu_trade/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:neu_trade/features/profile/presentation/screens/profile_setup_screen.dart';
@@ -46,6 +50,8 @@ GoRouter createAppRouter(AuthBloc authBloc) {
           return LoginScreen(
             returnTo: resolveAuthReturnLocation(
               state.uri.queryParameters['from'],
+              isAdmin: authBloc.state is AuthLoginState &&
+                  (authBloc.state as AuthLoginState).isAdmin,
             ),
           );
         },
@@ -57,6 +63,8 @@ GoRouter createAppRouter(AuthBloc authBloc) {
           return SignUpScreen(
             returnTo: resolveAuthReturnLocation(
               state.uri.queryParameters['from'],
+              isAdmin: authBloc.state is AuthLoginState &&
+                  (authBloc.state as AuthLoginState).isAdmin,
             ),
           );
         },
@@ -213,6 +221,46 @@ GoRouter createAppRouter(AuthBloc authBloc) {
                               key: ValueKey(user.id),
                               create: (_) => sl<StatisticsBloc>(),
                               child: const CirculationStatsScreen(),
+                            );
+                          },
+                        ),
+                  ),
+                  GoRoute(
+                    path: 'admin/posts',
+                    name: AppRouteNames.adminPosts,
+                    builder: (context, state) =>
+                        BlocBuilder<AuthBloc, AuthState>(
+                          bloc: authBloc,
+                          builder: (context, authState) {
+                            final user = switch (authState) {
+                              AuthLoginState(:final user) => user,
+                              _ => null,
+                            };
+                            if (user == null) return const SizedBox.shrink();
+                            return BlocProvider(
+                              key: ValueKey(user.id),
+                              create: (_) => sl<PostApprovalBloc>(),
+                              child: const PostApprovalScreen(),
+                            );
+                          },
+                        ),
+                  ),
+                  GoRoute(
+                    path: 'admin/reports',
+                    name: AppRouteNames.adminReports,
+                    builder: (context, state) =>
+                        BlocBuilder<AuthBloc, AuthState>(
+                          bloc: authBloc,
+                          builder: (context, authState) {
+                            final user = switch (authState) {
+                              AuthLoginState(:final user) => user,
+                              _ => null,
+                            };
+                            if (user == null) return const SizedBox.shrink();
+                            return BlocProvider(
+                              key: ValueKey(user.id),
+                              create: (_) => sl<ReportManagementBloc>(),
+                              child: const ReportManagementScreen(),
                             );
                           },
                         ),

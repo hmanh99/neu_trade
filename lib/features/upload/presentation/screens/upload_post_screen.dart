@@ -189,7 +189,9 @@ class _PostScreenState extends State<PostScreen> {
           context.read<PostBloc>().add(const PostFormReset());
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Đăng bài thành công!'),
+              content: Text(
+                'Đăng bài thành công, bài đang chờ quản trị viên duyệt.',
+              ),
               backgroundColor: ColorConstants.snackBarSuccessColor,
             ),
           );
