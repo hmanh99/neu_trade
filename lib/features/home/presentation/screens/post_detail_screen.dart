@@ -9,7 +9,7 @@ import '../../domain/entities/status.dart';
 import '../bloc/post_detail_bloc.dart';
 import '../bloc/post_detail_event.dart';
 import '../bloc/post_detail_state.dart';
-import '../../../../shared/home_formatters.dart';
+import '../../../../shared/wigdets/formatters.dart';
 import '../widgets/post_bottom_bar.dart';
 import '../widgets/post_detail_specs.dart';
 import '../widgets/post_image_gallery.dart';
@@ -186,7 +186,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
                             // Price
                             Text(
-                              HomeFormatters.formatCurrency(
+                              Formatters.formatCurrency(
                                 post.document.price,
                               ),
                               style: const TextStyle(

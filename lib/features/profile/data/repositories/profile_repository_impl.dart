@@ -12,7 +12,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
   final ProfileRemoteDatasource remoteDatasource;
 
   @override
-  Future<Either<Failure, UserProfile?>> getProfile({
+  Future<Either<Failure, UserProfileEntity?>> getProfile({
     required String userId,
   }) async {
     try {
@@ -27,18 +27,29 @@ class ProfileRepositoryImpl implements ProfileRepository {
 
   @override
   Future<Either<Failure, void>> saveProfile({
-    required UserProfile profile,
+    required UserProfileEntity profile,
   }) async {
     try {
       return Right(
         await remoteDatasource.saveProfile(
-          profile: ProfileModel.fromEntity(profile),
+          profile: UserProfileModel.fromEntity(profile),
         ),
       );
     } on ServerException catch (error) {
       return Left(Failure(error.message));
     } catch (_) {
       return Left(Failure('Không thể lưu thông tin. Vui lòng thử lại.'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> signOut() async {
+    try {
+      return Right(await remoteDatasource.signOut());
+    } on ServerException catch (error) {
+      return Left(Failure(error.message));
+    } catch (_) {
+      return Left(Failure('Không thể đăng xuất. Vui lòng thử lại.'));
     }
   }
 }

@@ -20,7 +20,7 @@ class ProfileLoadedState extends ProfileState {
   const ProfileLoadedState({required this.profile});
 
   // Null means this account has not created a profile yet.
-  final UserProfile? profile;
+  final UserProfileEntity? profile;
 
   @override
   List<Object?> get props => [profile];
@@ -33,10 +33,30 @@ class ProfileSavingState extends ProfileState {
 class ProfileSaveSuccessState extends ProfileState {
   const ProfileSaveSuccessState({required this.profile});
 
-  final UserProfile profile;
+  final UserProfileEntity profile;
 
   @override
   List<Object?> get props => [profile];
+}
+
+class ProfileSigningOutState extends ProfileLoadedState {
+  const ProfileSigningOutState({required super.profile});
+}
+
+class ProfileSignedOutState extends ProfileState {
+  const ProfileSignedOutState();
+}
+
+class ProfileSignOutErrorState extends ProfileLoadedState {
+  const ProfileSignOutErrorState({
+    required super.profile,
+    required this.message,
+  });
+
+  final String message;
+
+  @override
+  List<Object?> get props => [profile, message];
 }
 
 class ProfileErrorState extends ProfileState {

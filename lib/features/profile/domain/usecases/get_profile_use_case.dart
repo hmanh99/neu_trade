@@ -10,13 +10,13 @@ class GetProfileParams {
   final String userId;
 }
 
-class GetProfileUseCase implements UseCase<UserProfile?, GetProfileParams> {
+class GetProfileUseCase implements UseCase<UserProfileEntity?, GetProfileParams> {
   const GetProfileUseCase(this.repository);
 
   final ProfileRepository repository;
 
   @override
-  Future<Either<Failure, UserProfile?>> call(GetProfileParams params) {
+  Future<Either<Failure, UserProfileEntity?>> call(GetProfileParams params) {
     return repository.getProfile(userId: params.userId);
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:neu_trade/core/constants/color_constants.dart';
 import 'package:neu_trade/core/services/profile_services.dart';
 import '../../domain/entities/address.dart';
-import '../../../../shared/home_formatters.dart';
+import '../../../../shared/wigdets/formatters.dart';
 
 class PostSellerCard extends StatelessWidget {
   const PostSellerCard({
@@ -123,7 +123,7 @@ class PostSellerCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Đăng ${HomeFormatters.formatRelativeTime(createdAt)} · ${address.label}',
+                      'Đăng ${Formatters.formatRelativeTime(createdAt)} · ${address.label}',
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,

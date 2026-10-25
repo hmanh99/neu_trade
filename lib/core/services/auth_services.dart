@@ -79,4 +79,12 @@ class AuthServices {
       throw CustomAuthException(message: e.toString());
     }
   }
+
+  Future<Map<String, dynamic>?> getUserFlags({required String userId}) async {
+    return await _client
+        .from('sinh_vien')
+        .select('is_completed,is_admin')
+        .eq('sinhvien_id', userId)
+        .maybeSingle();
+  }
 }

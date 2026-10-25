@@ -1,11 +1,11 @@
 import 'package:bloc/bloc.dart';
 import 'package:neu_trade/core/usecase/usecase.dart';
-import 'package:neu_trade/features/review/domain/usecases/submit_review_usecase.dart';
 
 import '../../domain/entities/transaction_entity.dart';
 import '../../domain/usecases/cancel_transaction_usecase.dart';
 import '../../domain/usecases/complete_transaction_usecase.dart';
 import '../../domain/usecases/get_transactions_usecase.dart';
+import '../../domain/usecases/submit_review_usecase.dart';
 import 'transaction_event.dart';
 import 'transaction_state.dart';
 

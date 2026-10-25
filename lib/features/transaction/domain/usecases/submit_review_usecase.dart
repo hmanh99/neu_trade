@@ -2,8 +2,8 @@ import 'package:equatable/equatable.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:neu_trade/core/error/failure.dart';
 import 'package:neu_trade/core/usecase/usecase.dart';
-import 'package:neu_trade/features/review/domain/entities/review_entity.dart';
-import 'package:neu_trade/features/review/domain/repositories/review_repository.dart';
+import 'package:neu_trade/features/transaction/domain/entities/review_entity.dart';
+import 'package:neu_trade/features/transaction/domain/repositories/review_repository.dart';
 
 class SubmitReviewParams extends Equatable {
   final int transactionId;

@@ -22,6 +22,10 @@ class ProfileServices {
         .upsert(profile, onConflict: 'sinhvien_id');
   }
 
+  Future<void> signOut() async {
+    await _activeClient.auth.signOut();
+  }
+
   Future<Map<String, dynamic>?> getUserPublicStats({
     required String userId,
   }) async {

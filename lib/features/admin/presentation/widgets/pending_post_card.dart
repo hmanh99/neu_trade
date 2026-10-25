@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:neu_trade/core/constants/color_constants.dart';
 import 'package:neu_trade/features/admin/domain/entities/admin_post_entity.dart';
-import 'package:neu_trade/shared/home_formatters.dart';
+import 'package:neu_trade/shared/wigdets/formatters.dart';
 
 class PendingPostCard extends StatelessWidget {
   final AdminPostEntity post;
@@ -86,7 +86,7 @@ class PendingPostCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        HomeFormatters.formatRelativeTime(post.createdAt),
+                        Formatters.formatRelativeTime(post.createdAt),
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w500,
@@ -157,7 +157,7 @@ class PendingPostCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            HomeFormatters.formatCurrency(post.document.price),
+                            Formatters.formatCurrency(post.document.price),
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w800,

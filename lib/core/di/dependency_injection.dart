@@ -5,23 +5,25 @@ import 'package:neu_trade/core/services/post_services.dart';
 import 'package:neu_trade/core/services/profile_services.dart';
 import 'package:neu_trade/core/services/report_services.dart';
 import 'package:neu_trade/core/services/review_services.dart';
-import 'package:neu_trade/core/services/statistics_services.dart';
 import 'package:neu_trade/core/services/transaction_services.dart';
 import 'package:neu_trade/features/admin/data/datasources/admin_remote_datasource.dart';
 import 'package:neu_trade/features/admin/data/repositories/admin_repository_impl.dart';
 import 'package:neu_trade/features/admin/domain/repositories/admin_repository.dart';
 import 'package:neu_trade/features/admin/domain/usecases/approve_post_usecase.dart';
+import 'package:neu_trade/features/admin/domain/usecases/get_circulation_stats_usecase.dart';
 import 'package:neu_trade/features/admin/domain/usecases/get_pending_posts_usecase.dart';
 import 'package:neu_trade/features/admin/domain/usecases/get_reports_usecase.dart';
 import 'package:neu_trade/features/admin/domain/usecases/reject_post_usecase.dart';
 import 'package:neu_trade/features/admin/domain/usecases/resolve_report_usecase.dart';
 import 'package:neu_trade/features/admin/presentation/bloc/post_approval_bloc.dart';
 import 'package:neu_trade/features/admin/presentation/bloc/report_management_bloc.dart';
+import 'package:neu_trade/features/admin/presentation/bloc/statistics_bloc.dart';
 import 'package:neu_trade/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:neu_trade/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:neu_trade/features/auth/domain/repositories/auth_repository.dart';
 import 'package:neu_trade/features/auth/domain/usecases/forgot_password_use_case.dart';
 import 'package:neu_trade/features/auth/domain/usecases/get_current_user_use_case.dart';
+import 'package:neu_trade/features/auth/domain/usecases/get_user_flags_use_case.dart';
 import 'package:neu_trade/features/auth/domain/usecases/login_use_case.dart';
 import 'package:neu_trade/features/auth/domain/usecases/logout_use_case.dart';
 import 'package:neu_trade/features/auth/domain/usecases/sign_up_use_case.dart';
@@ -45,25 +47,20 @@ import 'package:neu_trade/features/profile/data/repositories/profile_repository_
 import 'package:neu_trade/features/profile/domain/repositories/profile_repository.dart';
 import 'package:neu_trade/features/profile/domain/usecases/get_profile_use_case.dart';
 import 'package:neu_trade/features/profile/domain/usecases/save_profile_use_case.dart';
+import 'package:neu_trade/features/profile/domain/usecases/sign_out_profile_use_case.dart';
 import 'package:neu_trade/features/profile/presentation/bloc/profile_bloc.dart';
-import 'package:neu_trade/features/review/data/datasources/review_remote_datasource.dart';
-import 'package:neu_trade/features/review/data/repositories/review_repository_impl.dart';
-import 'package:neu_trade/features/review/domain/repositories/review_repository.dart';
-import 'package:neu_trade/features/review/domain/usecases/get_rating_summary_usecase.dart';
-import 'package:neu_trade/features/review/domain/usecases/submit_review_usecase.dart';
-import 'package:neu_trade/features/statistics/data/datasources/statistics_remote_datasource.dart';
-import 'package:neu_trade/features/statistics/data/repositories/statistics_repository_impl.dart';
-import 'package:neu_trade/features/statistics/domain/repositories/statistics_repository.dart';
-import 'package:neu_trade/features/statistics/domain/usecases/get_circulation_stats_usecase.dart';
-import 'package:neu_trade/features/statistics/presentation/bloc/statistics_bloc.dart';
+import 'package:neu_trade/features/transaction/data/datasources/review_remote_datasource.dart';
 import 'package:neu_trade/features/transaction/data/datasources/transaction_remote_datasource.dart';
+import 'package:neu_trade/features/transaction/data/repositories/review_repository_impl.dart';
 import 'package:neu_trade/features/transaction/data/repositories/transaction_repository_impl.dart';
+import 'package:neu_trade/features/transaction/domain/repositories/review_repository.dart';
 import 'package:neu_trade/features/transaction/domain/repositories/transaction_repository.dart';
 import 'package:neu_trade/features/transaction/domain/usecases/cancel_transaction_usecase.dart';
 import 'package:neu_trade/features/transaction/domain/usecases/complete_transaction_usecase.dart';
 import 'package:neu_trade/features/transaction/domain/usecases/create_transaction_usecase.dart';
 import 'package:neu_trade/features/transaction/domain/usecases/get_transaction_usecase.dart';
 import 'package:neu_trade/features/transaction/domain/usecases/get_transactions_usecase.dart';
+import 'package:neu_trade/features/transaction/domain/usecases/submit_review_usecase.dart';
 import 'package:neu_trade/features/transaction/presentation/bloc/transaction_bloc.dart';
 import 'package:neu_trade/features/upload/data/datasources/post_remote_datasources.dart';
 import 'package:neu_trade/features/upload/data/repositories/upload_post_repository_impl.dart';
@@ -105,10 +102,6 @@ Future<void> initDependencies() async {
   sl.registerFactoryParam<ReviewServices, String?, void>(
     (userId, _) => ReviewServices(userId: _resolveUserId(userId), client: sl()),
   );
-  sl.registerFactoryParam<StatisticsServices, String?, void>(
-    (userId, _) =>
-        StatisticsServices(userId: _resolveUserId(userId), client: sl()),
-  );
   sl.registerFactoryParam<TransactionServices, String?, void>(
     (userId, _) =>
         TransactionServices(userId: _resolveUserId(userId), client: sl()),
@@ -141,6 +134,9 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<WatchAuthStateUseCase>(
     () => WatchAuthStateUseCase(sl()),
   );
+  sl.registerLazySingleton<GetUserFlagsUseCase>(
+    () => GetUserFlagsUseCase(sl()),
+  );
 
   // Bloc
   sl.registerLazySingleton<AuthBloc>(
@@ -151,7 +147,7 @@ Future<void> initDependencies() async {
       forgotPassword: sl(),
       logout: sl(),
       watchAuthState: sl(),
-      getProfile: sl(),
+      getUserFlags: sl(),
     ),
   );
 
@@ -169,6 +165,9 @@ Future<void> initDependencies() async {
   // UseCases
   sl.registerLazySingleton<GetProfileUseCase>(() => GetProfileUseCase(sl()));
   sl.registerLazySingleton<SaveProfileUseCase>(() => SaveProfileUseCase(sl()));
+  sl.registerLazySingleton<SignOutProfileUseCase>(
+    () => SignOutProfileUseCase(sl()),
+  );
 
   // Bloc
   sl.registerFactoryParam<ProfileBloc, String?, void>(
@@ -176,6 +175,7 @@ Future<void> initDependencies() async {
       userId: _resolveUserId(userId),
       getProfile: sl(),
       saveProfile: sl(),
+      signOutProfile: sl(),
     ),
   );
 
@@ -236,10 +236,16 @@ Future<void> initDependencies() async {
   sl.registerFactory<TransactionRemoteDatasource>(
     () => TransactionRemoteDatasourceImpl(sl()),
   );
+  sl.registerFactory<ReviewRemoteDatasource>(
+    () => ReviewRemoteDatasourceImpl(sl()),
+  );
 
   // Repositories
   sl.registerFactory<TransactionRepository>(
     () => TransactionRepositoryImpl(remoteDatasource: sl()),
+  );
+  sl.registerFactory<ReviewRepository>(
+    () => ReviewRepositoryImpl(remoteDatasource: sl()),
   );
 
   // UseCases
@@ -258,6 +264,9 @@ Future<void> initDependencies() async {
   sl.registerFactory<CancelTransactionUsecase>(
     () => CancelTransactionUsecase(sl()),
   );
+  sl.registerFactory<SubmitReviewUsecase>(
+    () => SubmitReviewUsecase(sl()),
+  );
 
   // Bloc
   sl.registerFactory<TransactionBloc>(
@@ -267,44 +276,6 @@ Future<void> initDependencies() async {
       cancelTransaction: sl(),
       submitReview: sl(),
     ),
-  );
-
-  // Feature: Review
-  // Datasources
-  sl.registerFactory<ReviewRemoteDatasource>(
-    () => ReviewRemoteDatasourceImpl(sl()),
-  );
-
-  // Repositories
-  sl.registerFactory<ReviewRepository>(
-    () => ReviewRepositoryImpl(remoteDatasource: sl()),
-  );
-
-  // UseCases
-  sl.registerFactory<SubmitReviewUsecase>(() => SubmitReviewUsecase(sl()));
-  sl.registerFactory<GetRatingSummaryUsecase>(
-    () => GetRatingSummaryUsecase(sl()),
-  );
-
-  // Feature: Statistics
-  // Datasources
-  sl.registerFactory<StatisticsRemoteDatasource>(
-    () => StatisticsRemoteDatasourceImpl(sl()),
-  );
-
-  // Repositories
-  sl.registerFactory<StatisticsRepository>(
-    () => StatisticsRepositoryImpl(remoteDatasource: sl()),
-  );
-
-  // UseCases
-  sl.registerFactory<GetCirculationStatsUsecase>(
-    () => GetCirculationStatsUsecase(sl()),
-  );
-
-  // Bloc
-  sl.registerFactory<StatisticsBloc>(
-    () => StatisticsBloc(getCirculationStats: sl()),
   );
 
   // Feature: Admin
@@ -334,6 +305,9 @@ Future<void> initDependencies() async {
   sl.registerFactory<ResolveReportUsecase>(
     () => ResolveReportUsecase(sl()),
   );
+  sl.registerFactory<GetCirculationStatsUsecase>(
+    () => GetCirculationStatsUsecase(sl()),
+  );
 
   // Blocs
   sl.registerFactory<PostApprovalBloc>(
@@ -348,5 +322,8 @@ Future<void> initDependencies() async {
       getReports: sl(),
       resolveReport: sl(),
     ),
+  );
+  sl.registerFactory<StatisticsBloc>(
+    () => StatisticsBloc(getCirculationStats: sl()),
   );
 }

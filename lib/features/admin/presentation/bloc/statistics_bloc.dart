@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:neu_trade/core/usecase/usecase.dart';
-import 'package:neu_trade/features/statistics/domain/usecases/get_circulation_stats_usecase.dart';
-import 'package:neu_trade/features/statistics/presentation/bloc/statistics_event.dart';
-import 'package:neu_trade/features/statistics/presentation/bloc/statistics_state.dart';
+import 'package:neu_trade/features/admin/domain/usecases/get_circulation_stats_usecase.dart';
+import 'package:neu_trade/features/admin/presentation/bloc/statistics_event.dart';
+import 'package:neu_trade/features/admin/presentation/bloc/statistics_state.dart';
 
 class StatisticsBloc extends Bloc<StatisticsEvent, StatisticsState> {
   final GetCirculationStatsUsecase _getCirculationStats;

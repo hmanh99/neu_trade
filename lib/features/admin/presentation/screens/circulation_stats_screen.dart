@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neu_trade/core/constants/color_constants.dart';
-import 'package:neu_trade/features/profile/presentation/widgets/profile_message.dart';
-import 'package:neu_trade/features/statistics/domain/entities/circulation_stat_entity.dart';
-import 'package:neu_trade/features/statistics/presentation/bloc/statistics_bloc.dart';
-import 'package:neu_trade/features/statistics/presentation/bloc/statistics_event.dart';
-import 'package:neu_trade/features/statistics/presentation/bloc/statistics_state.dart';
+import 'package:neu_trade/features/admin/domain/entities/circulation_stat_entity.dart';
+import 'package:neu_trade/features/admin/presentation/bloc/statistics_bloc.dart';
+import 'package:neu_trade/features/admin/presentation/bloc/statistics_event.dart';
+import 'package:neu_trade/features/admin/presentation/bloc/statistics_state.dart';
 
 class CirculationStatsScreen extends StatefulWidget {
   const CirculationStatsScreen({super.key});
@@ -44,6 +43,14 @@ class _CirculationStatsScreenState extends State<CirculationStatsScreen> {
           appBar: AppBar(
             backgroundColor: Colors.white,
             elevation: 0,
+            leading: IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: ColorConstants.textPrimaryColor,
+                size: 20,
+              ),
+              onPressed: () => Navigator.of(context).maybePop(),
+            ),
             title: const Text(
               'Thống kê luân chuyển',
               style: TextStyle(
@@ -57,7 +64,10 @@ class _CirculationStatsScreenState extends State<CirculationStatsScreen> {
               IconButton(
                 tooltip: 'Tải lại số liệu',
                 onPressed: loading ? null : _reload,
-                icon: const Icon(Icons.refresh_rounded),
+                icon: const Icon(
+                  Icons.refresh_rounded,
+                  color: ColorConstants.textPrimaryColor,
+                ),
               ),
             ],
           ),
@@ -69,24 +79,90 @@ class _CirculationStatsScreenState extends State<CirculationStatsScreen> {
 
   Widget _buildBody(StatisticsState state) {
     if (state is StatisticsErrorState) {
-      return ProfileMessage(
-        icon: Icons.cloud_off_outlined,
-        title: 'Không thể tải thống kê',
-        message: state.message.isNotEmpty
-            ? state.message
-            : 'Vui lòng kiểm tra kết nối và thử lại.',
-        onRetry: _reload,
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.cloud_off_rounded,
+                size: 48,
+                color: ColorConstants.greyShade400,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                state.message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: ColorConstants.textSecondaryColor,
+                ),
+              ),
+              const SizedBox(height: 16),
+              FilledButton.icon(
+                onPressed: _reload,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Thử lại'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: ColorConstants.primaryColor,
+                ),
+              ),
+            ],
+          ),
+        ),
       );
     }
 
     if (state is StatisticsLoadedState) {
       final stats = state.stats;
       if (stats.isEmpty) {
-        return ProfileMessage(
-          icon: Icons.insights_outlined,
-          title: 'Chưa có số liệu thống kê',
-          message: 'Dữ liệu luân chuyển tài liệu theo kỳ sẽ hiển thị tại đây.',
-          onRetry: _reload,
+        return RefreshIndicator(
+          color: ColorConstants.primaryColor,
+          onRefresh: _reload,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.6,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: const BoxDecoration(
+                          color: ColorConstants.blueShade50,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.insights_rounded,
+                          size: 48,
+                          color: ColorConstants.primaryColor,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Chưa có dữ liệu thống kê',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: ColorConstants.textPrimaryColor,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Số liệu luân chuyển tài liệu theo học kỳ sẽ hiển thị tại đây.',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: ColorConstants.textSecondaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         );
       }
 

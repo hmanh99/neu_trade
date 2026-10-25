@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:neu_trade/core/constants/color_constants.dart';
 import '../../domain/entities/condition.dart';
 import '../../domain/entities/home_post_entity.dart';
-import '../../../../shared/home_formatters.dart';
+import '../../../../shared/wigdets/formatters.dart';
 
 class HomePostCard extends StatelessWidget {
   const HomePostCard({
@@ -152,7 +152,7 @@ class HomePostCard extends StatelessWidget {
 
                       // Price
                       Text(
-                        HomeFormatters.formatCurrency(post.document.price),
+                        Formatters.formatCurrency(post.document.price),
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
@@ -194,7 +194,7 @@ class HomePostCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            HomeFormatters.formatRelativeTime(post.createdAt),
+                            Formatters.formatRelativeTime(post.createdAt),
                             style: const TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w400,

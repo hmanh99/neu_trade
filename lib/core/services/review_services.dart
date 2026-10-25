@@ -30,15 +30,4 @@ class ReviewServices {
     );
     return Map<String, dynamic>.from(result as Map);
   }
-
-  Future<Map<String, dynamic>> getRatingSummary({
-    required String targetUserId,
-  }) async {
-    _requireSession();
-    final result = await _client.rpc(
-      'get_rating_summary',
-      params: {'p_sinhvien_id': targetUserId},
-    );
-    return Map<String, dynamic>.from(result as Map);
-  }
 }

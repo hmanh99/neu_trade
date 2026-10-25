@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:neu_trade/core/constants/color_constants.dart';
 import '../../domain/entities/home_post_entity.dart';
-import '../../../../shared/home_formatters.dart';
+import '../../../../shared/wigdets/formatters.dart';
 
 class ReserveBottomSheet extends StatefulWidget {
   const ReserveBottomSheet({
@@ -149,7 +149,7 @@ class _ReserveBottomSheetState extends State<ReserveBottomSheet> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        HomeFormatters.formatCurrency(widget.post.document.price),
+                        Formatters.formatCurrency(widget.post.document.price),
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,

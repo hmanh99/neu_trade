@@ -1,5 +1,5 @@
-class HomeFormatters {
-  HomeFormatters._();
+class Formatters {
+  Formatters._();
 
   static String formatCurrency(double amount) {
     final integerPart = amount.toInt();

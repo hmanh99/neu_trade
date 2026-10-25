@@ -8,7 +8,7 @@ import '../../domain/entities/user_profile.dart';
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader({super.key, required this.profile});
 
-  final UserProfile profile;
+  final UserProfileEntity profile;
 
   String get _initials {
     final words = profile.fullName

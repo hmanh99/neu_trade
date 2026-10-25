@@ -18,7 +18,7 @@ abstract final class AppRoutePaths {
   static const transaction = '/app/transaction';
   static const profile = '/app/profile';
   static const profileSetup = '/app/profile/setup';
-  static const circulationStats = '/app/profile/statistics';
+  static const circulationStats = '/app/profile/admin/statistics';
   static const adminPosts = '/app/profile/admin/posts';
   static const adminReports = '/app/profile/admin/reports';
 
@@ -34,7 +34,7 @@ abstract final class AppRoutePaths {
 
   static bool isAdminPath(String location) {
     final path = Uri.parse(location).path;
-    return path == circulationStats || _isPathWithin(path, '/app/profile/admin');
+    return _isPathWithin(path, '/app/profile/admin');
   }
 
   static bool _isPathWithin(String path, String root) =>

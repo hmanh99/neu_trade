@@ -25,4 +25,9 @@ abstract class AuthRepository {
 
   // Emits the current user whenever the Supabase auth session changes.
   Stream<Either<Failure, UserEntity?>> watchAuthState();
+
+  // Load user status flags (profile completion and admin role).
+  Future<Either<Failure, ({bool isCompleted, bool isAdmin})>> getUserFlags({
+    required String userId,
+  });
 }

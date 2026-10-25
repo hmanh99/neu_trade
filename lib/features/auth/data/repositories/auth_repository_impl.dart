@@ -87,4 +87,18 @@ class AuthRepositoryImpl implements AuthRepository {
       return Right(user.toEntity());
     });
   }
+
+  @override
+  Future<Either<Failure, ({bool isCompleted, bool isAdmin})>> getUserFlags({
+    required String userId,
+  }) async {
+    try {
+      final flags = await remoteDatasource.getUserFlags(userId: userId);
+      return Right(flags);
+    } on ServerException catch (e) {
+      return Left(Failure(e.message));
+    } catch (e) {
+      return Left(Failure(e.toString()));
+    }
+  }
 }

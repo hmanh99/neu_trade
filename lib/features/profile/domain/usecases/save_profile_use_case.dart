@@ -7,7 +7,7 @@ import 'package:neu_trade/features/profile/domain/repositories/profile_repositor
 class SaveProfileParams {
   const SaveProfileParams({required this.profile});
 
-  final UserProfile profile;
+  final UserProfileEntity profile;
 }
 
 class SaveProfileUseCase implements UseCase<void, SaveProfileParams> {

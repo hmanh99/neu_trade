@@ -1,6 +1,7 @@
 import 'package:neu_trade/core/services/admin_services.dart';
 import 'package:neu_trade/features/admin/data/models/admin_post_model.dart';
 import 'package:neu_trade/features/admin/data/models/admin_report_model.dart';
+import 'package:neu_trade/features/admin/data/models/circulation_stat_model.dart';
 
 abstract class AdminRemoteDatasource {
   Future<List<AdminPostModel>> getPendingPosts();
@@ -12,6 +13,8 @@ abstract class AdminRemoteDatasource {
   Future<List<AdminReportModel>> getReports({String? status});
 
   Future<void> resolveReport({required int reportId, required String status});
+
+  Future<List<CirculationStatModel>> getCirculationStats();
 }
 
 class AdminRemoteDataSourceImpl implements AdminRemoteDatasource {
@@ -47,5 +50,11 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDatasource {
     required String status,
   }) async {
     await _adminServices.resolveReport(reportId: reportId, status: status);
+  }
+
+  @override
+  Future<List<CirculationStatModel>> getCirculationStats() async {
+    final list = await _adminServices.getCirculationStats();
+    return list.map(CirculationStatModel.fromJson).toList();
   }
 }

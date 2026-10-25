@@ -27,5 +27,9 @@ class ProfileSaveEvent extends ProfileEvent {
   final bool isCompleted;
 
   @override
-  List<Object?> get props => [studentId, fullName, email, phone,isCompleted];
+  List<Object?> get props => [studentId, fullName, email, phone, isCompleted];
+}
+
+class ProfileSignOutEvent extends ProfileEvent {
+  const ProfileSignOutEvent();
 }

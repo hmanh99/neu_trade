@@ -1,4 +1,4 @@
-import 'package:neu_trade/features/review/domain/entities/review_entity.dart';
+import 'package:neu_trade/features/transaction/domain/entities/review_entity.dart';
 
 class ReviewModel extends ReviewEntity {
   const ReviewModel({

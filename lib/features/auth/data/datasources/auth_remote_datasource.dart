@@ -17,6 +17,10 @@ abstract class AuthRemoteDatasource {
   UserModel? get currentUser;
 
   Stream<UserModel?> watchAuthState();
+
+  Future<({bool isCompleted, bool isAdmin})> getUserFlags({
+    required String userId,
+  });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDatasource {
@@ -25,7 +29,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDatasource {
   AuthRemoteDataSourceImpl(this._authService);
 
   @override
-  // TODO: implement currentUser
   UserModel? get currentUser {
     final user = _authService.user;
     if (user == null) return null;
@@ -93,5 +96,20 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDatasource {
       if (user == null) return null;
       return UserModel.fromJson(user);
     });
+  }
+
+  @override
+  Future<({bool isCompleted, bool isAdmin})> getUserFlags({
+    required String userId,
+  }) async {
+    try {
+      final data = await _authService.getUserFlags(userId: userId);
+      return (
+        isCompleted: (data?['is_completed'] as bool?) ?? false,
+        isAdmin: (data?['is_admin'] as bool?) ?? false,
+      );
+    } catch (_) {
+      return (isCompleted: false, isAdmin: false);
+    }
   }
 }

@@ -6,19 +6,20 @@ import 'package:neu_trade/core/router/route_names.dart';
 import 'package:neu_trade/core/router/route_paths.dart';
 import 'package:neu_trade/features/admin/presentation/bloc/post_approval_bloc.dart';
 import 'package:neu_trade/features/admin/presentation/bloc/report_management_bloc.dart';
+import 'package:neu_trade/features/admin/presentation/bloc/statistics_bloc.dart';
+import 'package:neu_trade/features/admin/presentation/screens/circulation_stats_screen.dart';
 import 'package:neu_trade/features/admin/presentation/screens/post_approval_screen.dart';
 import 'package:neu_trade/features/admin/presentation/screens/report_management_screen.dart';
 import 'package:neu_trade/features/home/presentation/bloc/post_detail_bloc.dart';
 import 'package:neu_trade/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:neu_trade/features/profile/presentation/screens/profile_setup_screen.dart';
-import 'package:neu_trade/features/statistics/presentation/bloc/statistics_bloc.dart';
-import 'package:neu_trade/features/statistics/presentation/screens/circulation_stats_screen.dart';
 import 'package:neu_trade/features/transaction/presentation/bloc/transaction_bloc.dart';
 import 'package:neu_trade/features/upload/presentation/bloc/upload_post_bloc.dart';
 import 'package:neu_trade/features/upload/presentation/screens/upload_post_screen.dart';
 import 'package:neu_trade/shared/wigdets/main_shell.dart';
 
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
+import '../../features/auth/presentation/bloc/auth_event.dart';
 import '../../features/auth/presentation/bloc/auth_state.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
@@ -206,7 +207,7 @@ GoRouter createAppRouter(AuthBloc authBloc) {
                 ),
                 routes: [
                   GoRoute(
-                    path: 'statistics',
+                    path: 'admin/statistics',
                     name: AppRouteNames.circulationStats,
                     builder: (context, state) =>
                         BlocBuilder<AuthBloc, AuthState>(
@@ -288,6 +289,9 @@ GoRouter createAppRouter(AuthBloc authBloc) {
             child: ProfileSetupScreen(
               userId: user.id,
               initialEmail: user.email,
+              onProfileCompleted: () {
+                authBloc.add(const AuthProfileCompletedEvent());
+              },
             ),
           );
         },

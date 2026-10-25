@@ -1,4 +1,4 @@
-import 'package:neu_trade/features/statistics/domain/entities/circulation_stat_entity.dart';
+import 'package:neu_trade/features/admin/domain/entities/circulation_stat_entity.dart';
 
 class CirculationStatModel extends CirculationStatEntity {
   const CirculationStatModel({

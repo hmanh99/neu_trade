@@ -100,4 +100,19 @@ class AdminServices {
       throw ServerException(message: 'Không thể xử lý báo cáo.');
     }
   }
+
+  Future<List<Map<String, dynamic>>> getCirculationStats() async {
+    _requireSession();
+    try {
+      final result = await _client.rpc('get_thong_ke_luan_chuyen');
+      final list = result as List<dynamic>? ?? const [];
+      return list
+          .map((item) => Map<String, dynamic>.from(item as Map))
+          .toList();
+    } on PostgrestException catch (e) {
+      throw ServerException(message: e.message);
+    } catch (e) {
+      throw ServerException(message: 'Không thể tải số liệu thống kê luân chuyển.');
+    }
+  }
 }

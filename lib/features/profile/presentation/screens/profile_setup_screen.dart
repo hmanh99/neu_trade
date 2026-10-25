@@ -4,8 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:neu_trade/core/constants/color_constants.dart';
 import 'package:neu_trade/core/router/route_paths.dart';
-import 'package:neu_trade/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:neu_trade/features/auth/presentation/bloc/auth_event.dart';
 import 'package:neu_trade/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:neu_trade/features/profile/presentation/bloc/profile_event.dart';
 import 'package:neu_trade/features/profile/presentation/bloc/profile_state.dart';
@@ -15,10 +13,12 @@ class ProfileSetupScreen extends StatefulWidget {
     super.key,
     required this.userId,
     required this.initialEmail,
+    this.onProfileCompleted,
   });
 
   final String userId;
   final String initialEmail;
+  final VoidCallback? onProfileCompleted;
 
   @override
   State<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
@@ -86,7 +86,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
           final profile = state.profile;
           if (profile != null) {
             if (profile.isCompleted) {
-              context.read<AuthBloc>().add(const AuthProfileCompletedEvent());
+              widget.onProfileCompleted?.call();
               context.go(AppRoutePaths.appHome);
               return;
             }
@@ -97,7 +97,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
           }
         }
         if (state is ProfileSaveSuccessState) {
-          context.read<AuthBloc>().add(const AuthProfileCompletedEvent());
+          widget.onProfileCompleted?.call();
           context.go(AppRoutePaths.appHome);
         }
         if (state is ProfileErrorState) {
@@ -329,7 +329,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                   decoration: BoxDecoration(
                                     gradient: ColorConstants.primaryGradient,
                                     borderRadius: BorderRadius.circular(14),
-                                    boxShadow: [
+                                  boxShadow: [
                                       BoxShadow(
                                         color: ColorConstants.primaryColor
                                             .withValues(alpha: 0.35),

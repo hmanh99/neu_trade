@@ -1,7 +1,7 @@
 import 'package:neu_trade/features/profile/domain/entities/user_profile.dart';
 
-class ProfileModel extends UserProfile {
-  const ProfileModel({
+class UserProfileModel extends UserProfileEntity {
+  const UserProfileModel({
     required super.userId,
     required super.studentId,
     required super.fullName,
@@ -13,8 +13,8 @@ class ProfileModel extends UserProfile {
     super.isAdmin = false,
   });
 
-  factory ProfileModel.fromJson(Map<String, dynamic> json) {
-    return ProfileModel(
+  factory UserProfileModel.fromJson(Map<String, dynamic> json) {
+    return UserProfileModel(
       userId: json['sinhvien_id'] as String,
       studentId: json['msv'] as String,
       fullName: json['ho_ten'] as String,
@@ -27,8 +27,8 @@ class ProfileModel extends UserProfile {
     );
   }
 
-  factory ProfileModel.fromEntity(UserProfile profile) {
-    return ProfileModel(
+  factory UserProfileModel.fromEntity(UserProfileEntity profile) {
+    return UserProfileModel(
       userId: profile.userId,
       studentId: profile.studentId,
       fullName: profile.fullName,
@@ -41,8 +41,8 @@ class ProfileModel extends UserProfile {
     );
   }
 
-  UserProfile toEntity() {
-    return UserProfile(
+  UserProfileEntity toEntity() {
+    return UserProfileEntity(
       userId: userId,
       studentId: studentId,
       fullName: fullName,

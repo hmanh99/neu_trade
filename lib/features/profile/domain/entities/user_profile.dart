@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-class UserProfile extends Equatable {
-  const UserProfile({
+class UserProfileEntity extends Equatable {
+  const UserProfileEntity({
     required this.userId,
     required this.studentId,
     required this.fullName,

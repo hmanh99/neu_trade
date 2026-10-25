@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:neu_trade/core/constants/color_constants.dart';
 import 'package:neu_trade/features/admin/presentation/widgets/admin_menu_section.dart';
-import 'package:neu_trade/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:neu_trade/features/auth/presentation/bloc/auth_event.dart';
-import 'package:neu_trade/features/auth/presentation/bloc/auth_state.dart';
 import 'package:neu_trade/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:neu_trade/features/profile/presentation/bloc/profile_event.dart';
 import 'package:neu_trade/features/profile/presentation/bloc/profile_state.dart';
-import 'package:neu_trade/features/profile/presentation/widgets/profile_field.dart';
+import 'package:neu_trade/features/profile/presentation/widgets/info_card.dart';
 
 import '../widgets/profile_header.dart';
 import '../widgets/profile_message.dart';
@@ -29,7 +26,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _reload() async {
     final bloc = context.read<ProfileBloc>();
-    if (bloc.state is ProfileLoadingState || bloc.state is ProfileSavingState) {
+    if (bloc.state is ProfileLoadingState ||
+        bloc.state is ProfileSavingState ||
+        bloc.state is ProfileSigningOutState) {
       return;
     }
     final completed = bloc.stream.firstWhere(
@@ -68,56 +67,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
 
     if (confirmed == true && mounted) {
-      context.read<AuthBloc>().add(const AuthSignOutEvent());
+      context.read<ProfileBloc>().add(const ProfileSignOutEvent());
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthBloc, AuthState>(
-      listener: (context, authState) {
-        if (authState is AuthErrorState) {
+    return BlocConsumer<ProfileBloc, ProfileState>(
+      listener: (context, state) {
+        if (state is ProfileSignOutErrorState) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(authState.message),
+              content: Text(state.message),
               backgroundColor: ColorConstants.snackBarFailedColor,
             ),
           );
         }
       },
-      child: BlocBuilder<ProfileBloc, ProfileState>(
-        builder: (context, state) {
-          final loading =
-              state is ProfileInitialState ||
-              state is ProfileLoadingState ||
-              state is ProfileSavingState;
-          return Scaffold(
-            backgroundColor: ColorConstants.backgroundColor,
-            appBar: AppBar(
-              backgroundColor: Colors.white,
-              elevation: 0,
-              title: const Text(
-                'Hồ sơ sinh viên',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  color: ColorConstants.textPrimaryColor,
-                  letterSpacing: -0.4,
-                ),
+      builder: (context, state) {
+        final loading =
+            state is ProfileInitialState ||
+            state is ProfileLoadingState ||
+            state is ProfileSavingState ||
+            state is ProfileSigningOutState;
+        return Scaffold(
+          backgroundColor: ColorConstants.backgroundColor,
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            title: const Text(
+              'Hồ sơ sinh viên',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: ColorConstants.textPrimaryColor,
+                letterSpacing: -0.4,
               ),
-              automaticallyImplyLeading: false,
-              actions: [
-                IconButton(
-                  tooltip: 'Tải lại hồ sơ',
-                  onPressed: loading ? null : _reload,
-                  icon: const Icon(Icons.refresh_rounded),
-                ),
-              ],
             ),
-            body: SafeArea(child: _body(state)),
-          );
-        },
-      ),
+            automaticallyImplyLeading: false,
+            actions: [
+              IconButton(
+                tooltip: 'Tải lại hồ sơ',
+                onPressed: loading ? null : _reload,
+                icon: const Icon(Icons.refresh_rounded),
+              ),
+            ],
+          ),
+          body: SafeArea(child: _body(state)),
+        );
+      },
     );
   }
 
@@ -149,65 +147,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: const EdgeInsets.all(20),
           children: [
             ProfileHeader(profile: profile),
+            if (!profile.isAdmin) ...[
             const SizedBox(height: 24),
-            const Text(
-              'Thông tin sinh viên',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                color: ColorConstants.textPrimaryColor,
-                letterSpacing: -0.3,
+              const Text(
+                'Thông tin sinh viên',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  color: ColorConstants.textPrimaryColor,
+                  letterSpacing: -0.3,
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: ColorConstants.borderLightColor),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x060F172A),
-                    blurRadius: 12,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  ProfileField(
-                    icon: Icons.badge_outlined,
-                    label: 'Mã sinh viên',
-                    value: profile.studentId,
-                  ),
-                  const Divider(color: ColorConstants.dividerColor),
-                  ProfileField(
-                    icon: Icons.person_outline,
-                    label: 'Họ và tên',
-                    value: profile.fullName,
-                  ),
-                  const Divider(color: ColorConstants.dividerColor),
-                  ProfileField(
-                    icon: Icons.phone_outlined,
-                    label: 'Số điện thoại',
-                    value: profile.phone,
-                  ),
-                  const Divider(color: ColorConstants.dividerColor),
-                  ProfileField(
-                    icon: Icons.alternate_email,
-                    label: 'Email sinh viên',
-                    value: profile.email,
-                  ),
-                ],
-              ),
-            ),
+              const SizedBox(height: 12),
+              InfoCard(profile: profile)
+            ],
             if (profile.isAdmin) ...[
               const SizedBox(height: 24),
               const AdminMenuSection(),
             ],
             const SizedBox(height: 24),
             InkWell(
-              onTap: _confirmSignOut,
+              onTap: state is ProfileSigningOutState ? null : _confirmSignOut,
               borderRadius: BorderRadius.circular(14),
               child: Container(
                 width: double.infinity,

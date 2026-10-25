@@ -3,7 +3,7 @@ import 'package:neu_trade/core/constants/color_constants.dart';
 import 'package:neu_trade/features/admin/domain/entities/admin_report_entity.dart';
 import 'package:neu_trade/features/admin/domain/entities/report_status.dart';
 
-import '../../../../shared/home_formatters.dart';
+import '../../../../shared/wigdets/formatters.dart';
 
 class ReportCard extends StatelessWidget {
   final AdminReportEntity report;
@@ -48,7 +48,7 @@ class ReportCard extends StatelessWidget {
                 _buildStatusBadge(report.status),
                 const Spacer(),
                 Text(
-                  HomeFormatters.formatRelativeTime(report.createdAt),
+                  Formatters.formatRelativeTime(report.createdAt),
                   style: const TextStyle(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w500,

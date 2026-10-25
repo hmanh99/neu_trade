@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:neu_trade/core/constants/color_constants.dart';
-import '../../../../shared/home_formatters.dart';
+import '../../../../shared/wigdets/formatters.dart';
 
 class PostBottomBar extends StatelessWidget {
   const PostBottomBar({
@@ -55,7 +55,7 @@ class PostBottomBar extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                HomeFormatters.formatCurrency(price),
+                Formatters.formatCurrency(price),
                 style: const TextStyle(
                   fontSize: 21,
                   fontWeight: FontWeight.w800,
