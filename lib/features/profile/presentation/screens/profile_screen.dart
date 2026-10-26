@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:neu_trade/core/constants/color_constants.dart';
+import 'package:neu_trade/core/router/route_names.dart';
 import 'package:neu_trade/features/admin/presentation/widgets/admin_menu_section.dart';
 import 'package:neu_trade/features/profile/presentation/bloc/profile_bloc.dart';
 import 'package:neu_trade/features/profile/presentation/bloc/profile_event.dart';
@@ -148,7 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             ProfileHeader(profile: profile),
             if (!profile.isAdmin) ...[
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
               const Text(
                 'Thông tin sinh viên',
                 style: TextStyle(
@@ -159,7 +161,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              InfoCard(profile: profile)
+              InfoCard(profile: profile),
+              const SizedBox(height: 24),
+              const Text(
+                'Hoạt động của tôi',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  color: ColorConstants.textPrimaryColor,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              const SizedBox(height: 12),
+              _buildPostHistoryMenuItem(),
             ],
             if (profile.isAdmin) ...[
               const SizedBox(height: 24),
@@ -205,6 +219,80 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     return const Center(
       child: CircularProgressIndicator(color: ColorConstants.primaryColor),
+    );
+  }
+
+  Widget _buildPostHistoryMenuItem() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: ColorConstants.borderLightColor),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x060F172A),
+            blurRadius: 12,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+        child: InkWell(
+          onTap: () => context.pushNamed(AppRouteNames.postHistory),
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: ColorConstants.blueShade50,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.history_edu_rounded,
+                    color: ColorConstants.primaryColor,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Lịch sử bài đăng',
+                        style: TextStyle(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w700,
+                          color: ColorConstants.textPrimaryColor,
+                        ),
+                      ),
+                      SizedBox(height: 2),
+                      Text(
+                        'Xem lại và theo dõi trạng thái các tài liệu đã đăng',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: ColorConstants.textSecondaryColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: ColorConstants.greyShade400,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -92,13 +92,22 @@ class PostServices {
     return result;
   }
 
+  Future<List<Map<String, dynamic>>> getPostsByUserId() async {
+    _requireSession();
+    final result = await _client
+        .from('tin_dang')
+        .select('*,tai_lieu!inner(*)')
+        .eq('nguoi_dang_id', userId)
+        .order('ngay_tao', ascending: false);
+    return result;
+  }
+
   Future<Map<String, dynamic>> getPost({required int postId}) async {
     _requireSession();
     final result = await _client
         .from('tin_dang')
         .select('*,tai_lieu!inner(*)')
         .eq('tindang_id', postId)
-        .eq('trang_thai_tin', 'DangHienThi')
         .single();
     return result;
   }

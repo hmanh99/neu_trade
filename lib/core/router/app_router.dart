@@ -10,8 +10,10 @@ import 'package:neu_trade/features/admin/presentation/bloc/statistics_bloc.dart'
 import 'package:neu_trade/features/admin/presentation/screens/circulation_stats_screen.dart';
 import 'package:neu_trade/features/admin/presentation/screens/post_approval_screen.dart';
 import 'package:neu_trade/features/admin/presentation/screens/report_management_screen.dart';
+import 'package:neu_trade/features/home/domain/entities/home_post_entity.dart';
 import 'package:neu_trade/features/home/presentation/bloc/post_detail_bloc.dart';
 import 'package:neu_trade/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:neu_trade/features/profile/presentation/screens/post_history_screen.dart';
 import 'package:neu_trade/features/profile/presentation/screens/profile_setup_screen.dart';
 import 'package:neu_trade/features/transaction/presentation/bloc/transaction_bloc.dart';
 import 'package:neu_trade/features/upload/presentation/bloc/upload_post_bloc.dart';
@@ -206,6 +208,54 @@ GoRouter createAppRouter(AuthBloc authBloc) {
                   },
                 ),
                 routes: [
+                  GoRoute(
+                    path: 'posts',
+                    name: AppRouteNames.postHistory,
+                    builder: (context, state) =>
+                        BlocBuilder<AuthBloc, AuthState>(
+                          bloc: authBloc,
+                          builder: (context, authState) {
+                            final user = switch (authState) {
+                              AuthLoginState(:final user) => user,
+                              _ => null,
+                            };
+                            if (user == null) return const SizedBox.shrink();
+                            return PostHistoryScreen(
+                              key: ValueKey(user.id),
+                              userId: user.id,
+                            );
+                          },
+                        ),
+                    routes: [
+                      GoRoute(
+                        path: ':id',
+                        name: AppRouteNames.profilePostDetail,
+                        builder: (context, state) {
+                          final postId =
+                              int.tryParse(state.pathParameters['id'] ?? '') ??
+                              0;
+                          final authState = authBloc.state;
+                          final user = switch (authState) {
+                            AuthLoginState(:final user) => user,
+                            _ => null,
+                          };
+                          final userId = user?.id ?? '';
+                          final initialPost = state.extra is HomePostEntity
+                              ? state.extra as HomePostEntity
+                              : null;
+
+                          return BlocProvider(
+                            create: (_) =>
+                                sl<PostDetailBloc>(param1: initialPost),
+                            child: PostDetailScreen(
+                              postId: postId,
+                              currentUserId: userId,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                   GoRoute(
                     path: 'admin/statistics',
                     name: AppRouteNames.circulationStats,
