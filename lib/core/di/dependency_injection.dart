@@ -42,6 +42,17 @@ import 'package:neu_trade/features/home/domain/usecases/get_home_posts_usecase.d
 import 'package:neu_trade/features/home/domain/usecases/send_home_report_usecase.dart';
 import 'package:neu_trade/features/home/presentation/bloc/home_post_bloc.dart';
 import 'package:neu_trade/features/home/presentation/bloc/post_detail_bloc.dart';
+import 'package:neu_trade/features/post_history/data/datasources/post_history_remote_datasource.dart';
+import 'package:neu_trade/features/post_history/data/repositories/post_history_repository_impl.dart';
+import 'package:neu_trade/features/post_history/domain/entities/post_history_entity.dart';
+import 'package:neu_trade/features/post_history/domain/repositories/post_history_repository.dart';
+import 'package:neu_trade/features/post_history/domain/usecases/delete_post_history_usecase.dart';
+import 'package:neu_trade/features/post_history/domain/usecases/get_post_history_detail_usecase.dart';
+import 'package:neu_trade/features/post_history/domain/usecases/get_post_history_usecase.dart';
+import 'package:neu_trade/features/post_history/domain/usecases/update_post_history_usecase.dart';
+import 'package:neu_trade/features/post_history/presentation/bloc/post_history_bloc.dart';
+import 'package:neu_trade/features/post_history/presentation/bloc/post_history_detail_bloc.dart';
+import 'package:neu_trade/features/post_history/presentation/bloc/post_history_edit_bloc.dart';
 import 'package:neu_trade/features/profile/data/datasources/profile_remote_datasource.dart';
 import 'package:neu_trade/features/profile/data/repositories/profile_repository_impl.dart';
 import 'package:neu_trade/features/profile/domain/repositories/profile_repository.dart';
@@ -325,5 +336,55 @@ Future<void> initDependencies() async {
   );
   sl.registerFactory<StatisticsBloc>(
     () => StatisticsBloc(getCirculationStats: sl()),
+  );
+
+  // Feature: Post History
+  // Datasources
+  sl.registerFactory<PostHistoryRemoteDatasource>(
+    () => PostHistoryRemoteDatasourceImpl(sl()),
+  );
+
+  // Repositories
+  sl.registerFactory<PostHistoryRepository>(
+    () => PostHistoryRepositoryImpl(
+      remoteDatasource: sl(),
+      uuid: sl(),
+    ),
+  );
+
+  // UseCases
+  sl.registerFactory<GetPostHistoryUsecase>(
+    () => GetPostHistoryUsecase(sl()),
+  );
+  sl.registerFactory<GetPostHistoryDetailUsecase>(
+    () => GetPostHistoryDetailUsecase(sl()),
+  );
+  sl.registerFactory<UpdatePostHistoryUsecase>(
+    () => UpdatePostHistoryUsecase(sl()),
+  );
+  sl.registerFactory<DeletePostHistoryUsecase>(
+    () => DeletePostHistoryUsecase(sl()),
+  );
+
+  // Blocs
+  sl.registerFactory<PostHistoryBloc>(
+    () => PostHistoryBloc(
+      getPostHistory: sl(),
+      deletePostHistory: sl(),
+    ),
+  );
+  sl.registerFactoryParam<PostHistoryDetailBloc, PostHistoryEntity?, void>(
+    (initialPost, _) => PostHistoryDetailBloc(
+      getPostHistoryDetail: sl(),
+      deletePostHistory: sl(),
+      initialPost: initialPost,
+    ),
+  );
+  sl.registerFactoryParam<PostHistoryEditBloc, PostHistoryEntity?, void>(
+    (initialPost, _) => PostHistoryEditBloc(
+      getPostHistoryDetail: sl(),
+      updatePostHistory: sl(),
+      initialPost: initialPost,
+    ),
   );
 }

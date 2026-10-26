@@ -195,7 +195,7 @@ class _PostScreenState extends State<PostScreen> {
               backgroundColor: ColorConstants.snackBarSuccessColor,
             ),
           );
-          context.go(AppRoutePaths.appHome);
+          context.go(AppRoutePaths.postHistory);
         }
       },
       builder: (context, state) {

@@ -9,11 +9,12 @@ abstract final class AppRouteNames {
   static const appHome = 'app-home';
   static const postDetail = 'post-detail';
   static const upload = 'upload';
+  static const postHistory = 'post-history';
+  static const postHistoryDetail = 'post-history-detail';
+  static const postHistoryEdit = 'post-history-edit';
   static const transaction = 'transaction';
   static const profile = 'profile';
   static const profileSetup = 'profile-setup';
-  static const postHistory = 'post-history';
-  static const profilePostDetail = 'profile-post-detail';
   static const circulationStats = 'circulation-stats';
   static const adminPosts = 'admin-posts';
   static const adminReports = 'admin-reports';

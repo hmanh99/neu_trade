@@ -2,35 +2,80 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:neu_trade/core/constants/color_constants.dart';
 
-class MainShellScreen extends StatelessWidget {
+class ShellTabScope extends InheritedNotifier<ValueNotifier<int>> {
+  const ShellTabScope({
+    super.key,
+    required ValueNotifier<int> super.notifier,
+    required super.child,
+  });
+
+  static ValueNotifier<int>? maybeOf(BuildContext context) {
+    return context
+        .dependOnInheritedWidgetOfExactType<ShellTabScope>()
+        ?.notifier;
+  }
+}
+
+class MainShellScreen extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
 
   const MainShellScreen({required this.navigationShell, super.key});
 
   @override
+  State<MainShellScreen> createState() => _MainShellScreenState();
+}
+
+class _MainShellScreenState extends State<MainShellScreen> {
+  late final ValueNotifier<int> _tabIndexNotifier;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabIndexNotifier = ValueNotifier<int>(widget.navigationShell.currentIndex);
+  }
+
+  @override
+  void didUpdateWidget(covariant MainShellScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final newIndex = widget.navigationShell.currentIndex;
+    if (_tabIndexNotifier.value != newIndex) {
+      _tabIndexNotifier.value = newIndex;
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabIndexNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final currentIndex = navigationShell.currentIndex;
+    final currentIndex = widget.navigationShell.currentIndex;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
-      body: navigationShell,
+      body: ShellTabScope(
+        notifier: _tabIndexNotifier,
+        child: widget.navigationShell,
+      ),
       bottomNavigationBar: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: const Color(0x0A0F172A),
+              color: Color(0x0A0F172A),
               blurRadius: 16,
-              offset: const Offset(0, -4),
+              offset: Offset(0, -4),
             ),
           ],
-          border: const Border(
+          border: Border(
             top: BorderSide(color: ColorConstants.borderLightColor, width: 1),
           ),
         ),
         padding: EdgeInsets.only(
-          left: 16,
-          right: 16,
+          left: 8,
+          right: 8,
           top: 8,
           bottom: bottomPadding > 0 ? bottomPadding : 10,
         ),
@@ -56,18 +101,26 @@ class MainShellScreen extends StatelessWidget {
             _buildNavItem(
               index: 2,
               selectedIndex: currentIndex,
-              label: 'Giao dịch',
-              icon: Icons.swap_horiz_rounded,
-              activeIcon: Icons.swap_horizontal_circle_rounded,
+              label: 'Lịch sử',
+              icon: Icons.history_toggle_off_rounded,
+              activeIcon: Icons.history_rounded,
               onTap: () => _onTabSelected(2),
             ),
             _buildNavItem(
               index: 3,
               selectedIndex: currentIndex,
+              label: 'Giao dịch',
+              icon: Icons.swap_horiz_rounded,
+              activeIcon: Icons.swap_horizontal_circle_rounded,
+              onTap: () => _onTabSelected(3),
+            ),
+            _buildNavItem(
+              index: 4,
+              selectedIndex: currentIndex,
               label: 'Hồ sơ',
               icon: Icons.person_outline_rounded,
               activeIcon: Icons.person_rounded,
-              onTap: () => _onTabSelected(3),
+              onTap: () => _onTabSelected(4),
             ),
           ],
         ),
@@ -76,9 +129,10 @@ class MainShellScreen extends StatelessWidget {
   }
 
   void _onTabSelected(int index) {
-    navigationShell.goBranch(
+    _tabIndexNotifier.value = index;
+    widget.navigationShell.goBranch(
       index,
-      initialLocation: index == navigationShell.currentIndex,
+      initialLocation: index == widget.navigationShell.currentIndex,
     );
   }
 
@@ -98,7 +152,7 @@ class MainShellScreen extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),
         curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           color: isSelected
               ? ColorConstants.primaryColor.withValues(alpha: 0.1)

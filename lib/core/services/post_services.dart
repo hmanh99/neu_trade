@@ -111,4 +111,19 @@ class PostServices {
         .single();
     return result;
   }
+
+  Future<Map<String, dynamic>> updatePost(Map<String, dynamic> params) async {
+    _requireSession();
+    final result = await _client.rpc('update_my_post', params: params);
+    return Map<String, dynamic>.from(result as Map);
+  }
+
+  Future<Map<String, dynamic>> deletePost({required int postId}) async {
+    _requireSession();
+    final result = await _client.rpc(
+      'delete_my_post',
+      params: {'p_tindang_id': postId},
+    );
+    return Map<String, dynamic>.from(result as Map);
+  }
 }

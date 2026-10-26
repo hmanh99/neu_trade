@@ -15,10 +15,12 @@ abstract final class AppRoutePaths {
   static const appHome = '/app/home';
   static const postDetail = '/app/home/post/:id';
   static const upload = '/app/upload';
+  static const postHistory = '/app/history';
+  static const postHistoryDetail = '/app/history/post/:id';
+  static const postHistoryEdit = '/app/history/post/:id/edit';
   static const transaction = '/app/transaction';
   static const profile = '/app/profile';
   static const profileSetup = '/app/profile/setup';
-  static const postHistory = '/app/profile/posts';
   static const circulationStats = '/app/profile/admin/statistics';
   static const adminPosts = '/app/profile/admin/posts';
   static const adminReports = '/app/profile/admin/reports';
