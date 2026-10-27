@@ -1,8 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:neu_trade/core/usecase/usecase.dart';
+import 'package:neu_trade/core/utils/vietnamese_text_utils.dart';
 
 import '../../domain/entities/category.dart';
 import '../../domain/entities/home_post_entity.dart';
+import '../../domain/services/home_search_service.dart';
 import '../../domain/usecases/get_home_posts_usecase.dart';
 import 'home_post_event.dart';
 import 'home_post_state.dart';
@@ -99,7 +101,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   ) {
     if (state is! HomeLoadedState) return;
     final loaded = state as HomeLoadedState;
-    final query = event.query.trim().toLowerCase();
+    final query = VietnameseTextUtils.normalizeToNfc(
+      event.query,
+    ).trim().toLowerCase();
     final filtered = _filterPosts(
       loaded.allPosts,
       loaded.selectedCategory,
@@ -113,18 +117,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     Category? category,
     String query,
   ) {
-    return posts
-        .where((post) {
-          final matchesCategory =
-              category == null || post.document.category == category;
-          final matchesQuery =
-              query.isEmpty ||
-              post.title.toLowerCase().contains(query) ||
-              post.document.name.toLowerCase().contains(query) ||
-              (post.description != null &&
-                  post.description!.toLowerCase().contains(query));
-          return matchesCategory && matchesQuery;
-        })
-        .toList(growable: false);
+    return HomeSearchService.filterAndRankPosts(
+      posts: posts,
+      category: category,
+      rawQuery: query,
+    );
   }
 }

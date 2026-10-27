@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:neu_trade/core/constants/color_constants.dart';
+import 'package:neu_trade/core/utils/vietnamese_text_utils.dart';
 import '../../domain/entities/condition.dart';
 import '../../domain/entities/home_post_entity.dart';
 import '../../../../shared/wigdets/formatters.dart';
@@ -9,10 +10,12 @@ class HomePostCard extends StatelessWidget {
     super.key,
     required this.post,
     required this.onTap,
+    this.searchQuery = '',
   });
 
   final HomePostEntity post;
   final VoidCallback onTap;
+  final String searchQuery;
 
   @override
   Widget build(BuildContext context) {
@@ -136,18 +139,7 @@ class HomePostCard extends StatelessWidget {
                       const SizedBox(height: 7),
 
                       // Title
-                      Text(
-                        post.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w700,
-                          color: ColorConstants.textPrimaryColor,
-                          letterSpacing: -0.2,
-                          height: 1.3,
-                        ),
-                      ),
+                      _buildHighlightedTitle(post.title),
                       const SizedBox(height: 6),
 
                       // Price
@@ -211,6 +203,66 @@ class HomePostCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildHighlightedTitle(String rawTitle) {
+    const baseStyle = TextStyle(
+      fontSize: 14.5,
+      fontWeight: FontWeight.w700,
+      color: ColorConstants.textPrimaryColor,
+      letterSpacing: -0.2,
+      height: 1.3,
+    );
+
+    final titleNfc = VietnameseTextUtils.normalizeToNfc(rawTitle);
+    if (searchQuery.trim().isEmpty) {
+      return Text(
+        titleNfc,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: baseStyle,
+      );
+    }
+
+    final ranges = VietnameseTextUtils.findMatchRanges(titleNfc, searchQuery);
+    if (ranges.isEmpty) {
+      return Text(
+        titleNfc,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: baseStyle,
+      );
+    }
+
+    final highlightStyle = baseStyle.copyWith(
+      color: ColorConstants.primaryColor,
+      backgroundColor: ColorConstants.primaryLightBg,
+      fontWeight: FontWeight.w800,
+    );
+
+    final spans = <TextSpan>[];
+    var cursor = 0;
+    for (final range in ranges) {
+      if (range.start > cursor) {
+        spans.add(TextSpan(text: titleNfc.substring(cursor, range.start)));
+      }
+      spans.add(
+        TextSpan(
+          text: titleNfc.substring(range.start, range.end),
+          style: highlightStyle,
+        ),
+      );
+      cursor = range.end;
+    }
+    if (cursor < titleNfc.length) {
+      spans.add(TextSpan(text: titleNfc.substring(cursor)));
+    }
+
+    return Text.rich(
+      TextSpan(style: baseStyle, children: spans),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
     );
   }
 

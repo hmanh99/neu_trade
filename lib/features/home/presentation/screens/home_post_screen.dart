@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Row(
                 children: [
                   Container(
@@ -230,6 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           final post = state.filteredPosts[index];
                           return HomePostCard(
                             post: post,
+                            searchQuery: state.searchQuery,
                             onTap: () {
                               context.pushNamed(
                                 AppRouteNames.postDetail,
